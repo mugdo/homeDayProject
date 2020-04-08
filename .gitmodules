@@ -16,3 +16,6 @@
 [submodule "github.com/andybalholm/cascadia"]
 	path = github.com/andybalholm/cascadia
 	url = https://github.com/andybalholm/cascadia
+[submodule "golang.org/x/net"]
+	path = golang.org/x/net
+	url = https://github.com/golang/net.git
