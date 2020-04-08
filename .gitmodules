@@ -19,3 +19,6 @@
 [submodule "golang.org/x/net"]
 	path = golang.org/x/net
 	url = https://github.com/golang/net.git
+[submodule "golang.org/x/text"]
+	path = golang.org/x/text
+	url = https://github.com/golang/text.git
