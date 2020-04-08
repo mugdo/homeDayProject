@@ -1,3 +1,18 @@
 [submodule "github.com/PuerkitoBio/goquery"]
 	path = github.com/PuerkitoBio/goquery
 	url = https://github.com/PuerkitoBio/goquery
+[submodule "github.com/gorilla/sessions"]
+	path = github.com/gorilla/sessions
+	url = https://github.com/gorilla/sessions
+[submodule "github.com/gorilla/mux"]
+	path = github.com/gorilla/mux
+	url = https://github.com/gorilla/mux
+[submodule "github.com/go-sql-driver/mysql"]
+	path = github.com/go-sql-driver/mysql
+	url = https://github.com/go-sql-driver/mysql
+[submodule "github.com/gorilla/securecookie"]
+	path = github.com/gorilla/securecookie
+	url = https://github.com/gorilla/securecookie
+[submodule "github.com/andybalholm/cascadia"]
+	path = github.com/andybalholm/cascadia
+	url = https://github.com/andybalholm/cascadia
