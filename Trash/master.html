@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../assests/styles/main.css" type="text/css">
+    <title>{{.title}}</title>
+</head>
+<body>
+    <div id="main">
+        <div id="header">
+            <p>Logo</p>
+        </div>
+        <div id="navBar">
+            <div id="navLeft">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/problem">Problem</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </div>
+            <div id="navRight">
+                {{if .isLogged}}
+                    <div id="authentication">
+                        <ul>
+                            <li id="name">{{.username}}</li>
+                            <li><a href="/reset">Change Password</a></li>
+                            <li><a href="/logout"><i class="fa fa-user"></i>Logout</a></li>
+                        </ul>
+                    </div>
+                {{else}}
+                    <div id="authentication">
+                        <ul>
+                            <li><a href="/login"><i class="fa fa-unlock-alt"></i>Login</a></li>
+                            <li><a href="/register"><i class="fa fa-user"></i>Register</a></li>
+                        </ul>
+                    </div>
+                {{end}}
+            </div>
+        </div>
+        <div id="content">
+            {{if eq .title "Home"}}
+                <h1>Hello Homepage</h1>
+                <p>Hi</p>
+            {{else if eq .title "Problem"}}
+                <h1>Hello this is problem page</h1>
+                <div id="upperContent">
+                    <h3>Problem Name</h3>
+                    <p>Memory Limit : 512 MB</p>
+                    <p>Time Limit   : 1 Second</p>
+                    <p id="sub"><a href="/submit">Submit</a></p>
+                </div>
+                <div id="lowerContent">
+                    <div id="problemDescription"></div>
+                    <div id="inputDescription"></div>
+                    <div id="outputDescription"></div>
+                </div>
+            {{else if eq .title "About"}}
+                <h1>Welcome to your About page!</h1>
+            {{else if eq .title "Contact"}}
+                <h1>Welcome to your Contact page!</h1>
+            {{else if eq .title "Login"}}
+                <div id="login">
+                    <form class="loginForm" action="/loginCheck" method="POST">
+                        <h1>LOGIN</h1>
+                        <div class="form-group">
+                            <input type="text" name="username" class="form-control" value="" placeholder="Username" required>
+                            <span class="help-block"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                            <span class="help-block"></span>
+                        </div>
+                        <p style="color: red; text-align: center;">{{.err}}</p>
+                        <div class="form-group">
+                            <input type="submit" class="btn btn-primary" value="Login" name="">
+                        </div>
+                        <span><a href="/reset">Forgot Password?</a></span>
+                    </form>
+                </div>
+            {{end}}
+        </div>
+        <div id="footer" align="center">
+            <p>&copy; All Right Reserved</p>
+        </div>
+    </div>
+    <script src="../assests/scripts/main.js"></script>
+</body>
+</html>

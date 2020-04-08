@@ -1,0 +1,24 @@
+{{ define "head" }}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{{ .pageTitle }}</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="../assests/styles/main.css" type="text/css">
+        <script src="../assests/scripts/jquery-3.4.1.min.js"></script>
+    </head>
+    <body>
+        <div id="main">
+            {{ template "header" }}
+            {{ template "navbar" }}
+
+        {{/* main page content here
+            footer here
+        main div close
+        adding script source
+    body tag close
+html tag close */}}
+
+{{ end }}

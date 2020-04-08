@@ -1,0 +1,25 @@
+{{ define "verdictScript" }}
+
+<script>
+    var url = document.getElementById("url").innerText
+    var subID = document.getElementById("subID").innerText
+    url = url + subID
+    console.log(url)
+
+    $("button").click(function () {
+        $(document).ready(
+            function () {
+                var doCheck = setInterval(function () {
+                    $.getJSON(url, function (result) {
+                        $('#res').text(result.status);
+
+                        if(result.status=="Accepted" || result.status=="Worng Answer"){
+                            clearInterval(doCheck);
+                        }
+                    });
+                }, 2000);  //Delay here = .5 seconds
+            });
+    });
+</script>
+
+{{ end }}

@@ -1,0 +1,38 @@
+{{ template "head" . }}
+
+<div id="content">
+    <form id="registrationForm" action="/doRegister" method="post">
+        <h1>User Registration</h1>
+        <p>*All fields are required.</p>
+        <div>
+            <label for="fullName">Full Name :</label>
+            <input type="text" id="fullName" name="fullName" value="{{.fullName}}" required>
+            <span class="help-block"></span>
+        </div>
+        <div class="form-group">
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{.email}}" required><br>
+            <span style="color: red;">{{.errEmail}}</span>
+        </div>
+        <div class="form-group">
+            <label for="username">Username :</label>
+            <input type="text" id="username" name="username" class="form-control" value="{{.username}}"><br>
+            <span style="color: red;">{{.errUsername}}</span>
+        </div>
+        <div class="form-group">
+            <label for="password">Password :</label>
+            <input type="password" id="password" name="password" class="form-control" value="" required>
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password :</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" value="" required><br>
+            <span style="color: red;">{{.errPassword}}</span>
+        </div>
+        <div class="form-group">
+            <input type="reset" name="reset" value="Reset">
+            <input type="submit" name="register" value="Sign Up">
+        </div>
+    </form>
+</div>
+
+{{ template "close" }}

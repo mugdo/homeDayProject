@@ -1,0 +1,31 @@
+{{ template "head" . }}
+
+<div id="content">
+    <h1>Hello this is problem page</h1>
+    <div id="upperContent">
+        <h3>{{.PName}}</h3>
+        <p>Memory Limit : {{ .MemoryLimit }}</p>
+        <p>Time Limit   : {{ .TimeLimit }}</p>
+        <p id="sub"><a href="/submit">Submit</a></p>
+    </div>
+    <div id="lowerContent">
+        <div id="problemDescription">
+            <p>Here goes the problem statement</p><br>
+        </div>
+        <div id="inputDescription">
+            <h3>Input:</h3>
+            <p>Here goes the input description</p><br>
+        </div>
+        <div id="outputDescription">
+            <h3>Output:</h3>
+            <p>Here goes the output description</p><br>
+        </div>
+        <div id="sampleDescription">
+            <h3>Sample Test Cases:</h3>
+            <p>Input sample:</p><br>
+            <p>Output sample:</p>
+        </div>
+    </div>
+</div>
+
+{{ template "close" }}

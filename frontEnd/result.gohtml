@@ -1,0 +1,13 @@
+{{ template "head" . }}
+
+<div id="content">
+    <h2>Submission Result</h2>
+    <a href="/submit" id="submit">Submit</a>
+    <button>Refresh</button>
+
+    <p id="url" style="color: blueviolet;">{{ .Res.URL }}</p>
+    <p id="subID">{{ .Res.SubID }}</p>
+    <p id="res"></p>
+</div>
+
+{{ template "close" . }}

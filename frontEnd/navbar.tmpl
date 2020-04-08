@@ -1,0 +1,33 @@
+{{ define "navbar" }}
+
+<div id="navBar">
+    <div id="navLeft">
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/problem">Problem</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/submit">Test Submit</a></li>
+        </ul>
+    </div>
+    <div id="navRight">
+        {{if .isLogged }}
+        <div id="authentication">
+            <ul>
+                <li id="name">{{.username}}</li>
+                <li><a href="/reset">Change Password</a></li>
+                <li><a href="/logout"><i class="fa fa-user"></i>Logout</a></li>
+            </ul>
+        </div>
+        {{else}}
+        <div id="authentication">
+            <ul>
+                <li><a href="/login"><i class="fa fa-unlock-alt"></i>Login</a></li>
+                <li><a href="/register"><i class="fa fa-user"></i>Register</a></li>
+            </ul>
+        </div>
+        {{end}}
+    </div>
+</div>
+
+{{ end }}
