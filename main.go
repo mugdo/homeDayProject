@@ -35,7 +35,7 @@ func main() {
 	r.PathPrefix("/assests/").Handler(http.StripPrefix("/assests/", http.FileServer(http.Dir("assests"))))
 
 	//A Custom Page Not Found route
-	//r.NotFoundHandler = r.NewRoute().HandlerFunc(giveservice.PageNotFound).GetHandler()
+	r.NotFoundHandler = http.HandlerFunc(giveservice.PageNotFound)
 
 	//for localhost server
 	http.ListenAndServe(":8080", r)
