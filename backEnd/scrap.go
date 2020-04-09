@@ -1,4 +1,4 @@
-package giveservice
+package backEnd
 
 import (
 	"fmt"
@@ -9,6 +9,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	//"github.com/gocolly/colly"
 )
+
+var client = &http.Client{
+	Jar: cookieJar,
+}
 
 func getTimeLimit(body string) (a,b string) {
 	//fmt.Println(body)
@@ -35,7 +39,7 @@ func getTimeLimit(body string) (a,b string) {
 	return sb, sbm;
 }
 
-func getTitle() (a, b, c string) {
+func getTitle() (a, b, c, d string) {
 
 	fmt.Println("In GetTitle")
 	client := &http.Client{
@@ -63,14 +67,14 @@ func getTitle() (a, b, c string) {
 	src, iv := document.Find("iframe").Attr("src")
 
 	fmt.Println("src=",src,"iv",iv)
-	return title, timeLimit, memoryLimit
+	return title, timeLimit, memoryLimit,src
 }
 
 func Scrap(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("IN scrap")
 
-	title, timeLimit, memoryLimit := getTitle()
+	title, timeLimit, memoryLimit, dNum := getTitle()
 
 	fmt.Println("After getting title ",title)
 	fmt.Println("Finished Scrap")
@@ -87,6 +91,12 @@ func Scrap(w http.ResponseWriter, r *http.Request) {
 		"MemoryLimit"	: memoryLimit,
 		"pageTitle"		: title,
 	}
+
+	// getting problem description
+	url := "https://vjudge.net"+dNum
+	res, _ := rGET(url)
+
+	fmt.Printf(string(res))
 
 	tpl.ExecuteTemplate(w, "problemView.gohtml", data)
 

@@ -1,4 +1,4 @@
-package giveservice
+package backEnd
 
 import (
 	"fmt"
@@ -12,6 +12,7 @@ import (
 var cookieJar, _ = cookiejar.New(nil)
 
 func rGET(urlStr string) ([]byte, error) {
+	fmt.Println(urlStr)
 	client := &http.Client{
 		Jar: cookieJar,
 	}

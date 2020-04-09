@@ -1,4 +1,4 @@
-package giveservice
+package backEnd
 
 import (
 	"database/sql"
@@ -35,6 +35,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "index.gohtml", data)
 }
+
 func Problem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	lastPage = "problem"
