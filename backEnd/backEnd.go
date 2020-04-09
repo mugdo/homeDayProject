@@ -2,8 +2,9 @@ package backEnd
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
-	"net/http" 
+	"net/http"
 	"github.com/gorilla/sessions"
 )
 
@@ -80,6 +81,7 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 func ProblemView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	lastPage = "problem"
+	fmt.Println("In pv")
 
 	session, _ := store.Get(r, "mysession")
 

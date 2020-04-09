@@ -10,20 +10,23 @@
     </div>
     <div id="lowerContent">
         <div id="problemDescription">
-            <p>Here goes the problem statement</p><br>
+            {{ .PDes }}<br>
         </div>
         <div id="inputDescription">
-            <h3>Input:</h3>
-            <p>Here goes the input description</p><br>
+            <h3>{{ .PInputH }}</h3>
+            {{ .PInputD }}<br>
         </div>
         <div id="outputDescription">
-            <h3>Output:</h3>
-            <p>Here goes the output description</p><br>
+            <h3>{{ .POutputH }}</h3>
+            {{ .POutputD }}<br>
         </div>
         <div id="sampleDescription">
-            <h3>Sample Test Cases:</h3>
-            <p>Input sample:</p><br>
-            <p>Output sample:</p>
+            <h3>{{ .PExampleH }}</h3>
+            {{ .PExampleD }}<br>
+        </div>
+        <div id="sampleNote">
+            <h3>{{ .PNoteH }}</h3>
+            {{ .PNoteD }}<br>
         </div>
     </div>
 </div>
