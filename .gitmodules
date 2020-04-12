@@ -37,3 +37,21 @@
 [submodule "github.com/gobwas/glob"]
 	path = github.com/gobwas/glob
 	url = https://github.com/gobwas/glob
+[submodule "github.com/kennygrant/sanitize"]
+	path = github.com/kennygrant/sanitize
+	url = https://github.com/kennygrant/sanitize
+[submodule "github.com/saintfish/chardet"]
+	path = github.com/saintfish/chardet
+	url = https://github.com/saintfish/chardet
+[submodule "github.com/temoto/robotstxt"]
+	path = github.com/temoto/robotstxt
+	url = https://github.com/temoto/robotstxt
+[submodule "google.golang.org/appengine"]
+	path = google.golang.org/appengine
+	url = https://github.com/golang/appengine
+[submodule "github.com/golang/protobuf"]
+	path = github.com/golang/protobuf
+	url = https://github.com/golang/protobuf
+[submodule "github.com/golang/groupcache"]
+	path = github.com/golang/groupcache
+	url = https://github.com/golang/groupcache
