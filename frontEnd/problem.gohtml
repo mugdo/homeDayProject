@@ -73,7 +73,7 @@
             <td></td>
             <td>{{ $i.OriginOJ }}</td>
             <td>{{ $i.OriginProb }}</td>
-            {{ $link := (printf "https://vjudge.net/problem/%s-%s" $i.OriginOJ $i.OriginProb) }}
+            {{ $link := (printf "/problemView/%s-%s" $i.OriginOJ $i.OriginProb) }}
             <td><a href={{ $link }}>{{ $i.Title }}</a></td>
         </tr>
         {{ end }}

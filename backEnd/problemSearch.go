@@ -2,7 +2,6 @@ package backEnd
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/url"
 )
 
@@ -56,7 +55,7 @@ func pSearch(oj,pNum,pName string) ([]byte, error) {
 	data.Set("order[0][column]", "5")
 	data.Set("order[0][dir]", "desc")
 	data.Set("start", "0")
-	data.Set("length", "10")
+	data.Set("length", "20")
 	data.Set("search[value]", "")
 	data.Set("search[regex]", "false")
 	data.Set("OJId", oj)
@@ -90,8 +89,8 @@ func getPList(body []byte) (searchResult){
 
 	json.Unmarshal(body, &res)
 
-	fmt.Println("Problem Search Done")
-	fmt.Println(res.RecordsFiltered)
+	// fmt.Println("Problem Search Done")
+	// fmt.Println(res.RecordsFiltered)
 
 	return res
 }

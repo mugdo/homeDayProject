@@ -17,7 +17,8 @@ func main() {
 	//for serving perspective pages
 	r.HandleFunc("/", backEnd.Index)
 	r.HandleFunc("/problem", backEnd.Problem)
-	r.HandleFunc("/problemView", backEnd.ProblemView)
+	r.PathPrefix("/problemView").HandlerFunc(backEnd.ProblemView)
+	//r.HandleFunc("/problemView", backEnd.ProblemView)
 	r.HandleFunc("/login", backEnd.Login)
 	r.HandleFunc("/loginCheck", backEnd.LoginCheck)
 	r.HandleFunc("/redirect", backEnd.Redirect)
@@ -28,9 +29,10 @@ func main() {
 	r.HandleFunc("/contact", backEnd.Contact)
 	r.HandleFunc("/submit", backEnd.Submit)
 	r.HandleFunc("/result", backEnd.Result)
-	r.HandleFunc("/scrap", backEnd.Scrap)
+	//r.HandleFunc("/scrap", backEnd.Scrap)
 	r.HandleFunc("/toph", backEnd.Toph)
 	r.HandleFunc("/des", backEnd.Des)
+	r.HandleFunc("/testpage", backEnd.TestPage)
 	
 	//for serving javascripts & css files
 	r.PathPrefix("/assests/").Handler(http.StripPrefix("/assests/", http.FileServer(http.Dir("assests"))))

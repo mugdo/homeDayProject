@@ -14,47 +14,52 @@ var client = &http.Client{
 	Jar: cookieJar,
 }
 
-func getTimeLimit(body string) (a,b string) {
+func getTimeLimit(body string) (a, b string) {
 	//fmt.Println(body)
 
 	need := "ms"
 
-	index := strings.Index(body,need)
+	index := strings.Index(body, need)
 	fmt.Println("got Time")
 	fmt.Println(index)
 
 	runes := []rune(body)
-	sb := string(runes[0:index+2])
-	fmt.Println("Time Limit:",sb)
+	sb := "-"
+	if index != -1 {
+		sb = string(runes[0 : index+2])
+	}
+	fmt.Println("Time Limit:", sb)
 
-	need = "kB"
-	index2 := strings.Index(body,need)
+	// if oj == "CodeChef" {
+	// 	need = "B"
+	// }
+	need = "B"
+	index2 := strings.Index(body, need)
 	fmt.Println("got Memory")
 	fmt.Println(index2)
 
 	//runes = []rune(body)
-	sbm := string(runes[index+2:index2+2])
-	fmt.Println("Memory Limit:",sbm)
+	sbm := "-"
+	if index2 != -1 {
+		sbm = string(runes[index+2 : index2+1])
+	}
+	fmt.Println("Memory Limit:", sbm)
 
-	return sb, sbm;
+	return sb, sbm
 }
 
-func getTitle() (a, b, c, d string) {
-
+func getTitle(oj, pNum string) (a, b, c, d string) {
 	fmt.Println("In GetTitle")
 	client := &http.Client{
 		Jar: cookieJar,
 	}
-	pURL := "https://vjudge.net/problem/CodeForces-341C"
+	pURL := "https://vjudge.net/problem/" + oj + "-" + pNum
 
 	response, err := client.Get(pURL)
-
 	if err != nil {
 		log.Fatalln("Error fetching response. ", err)
 	}
-
 	defer response.Body.Close()
-
 	document, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
 		log.Fatal("Error loading HTTP response body. ", err)
@@ -66,34 +71,34 @@ func getTitle() (a, b, c, d string) {
 	title := document.Find("div[id='prob-title']").Find("h2").Text()
 	src, iv := document.Find("iframe").Attr("src")
 
-	fmt.Println("src=",src,"iv",iv)
-	return title, timeLimit, memoryLimit,src
+	fmt.Println("src=", src, "iv", iv)
+	return title, timeLimit, memoryLimit, src
 }
 
 func Scrap(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("IN scrap")
 
-	title, timeLimit, memoryLimit, dNum := getTitle()
+	title, timeLimit, memoryLimit, dNum := getTitle("CodeForces", "831A")
 
-	fmt.Println("After getting title ",title)
+	fmt.Println("After getting title ", title)
 	fmt.Println("Finished Scrap")
 
 	session, _ := store.Get(r, "mysession")
 	data := map[string]interface{}{
-		"username"		: session.Values["username"],
-		"password"		: session.Values["password"],
-		"isLogged"		: session.Values["isLogin"],
-		"Oj"			: "CF",
-		"PNum"			: "1111",
-		"PName"			: title,
-		"TimeLimit"		: timeLimit,
-		"MemoryLimit"	: memoryLimit,
-		"pageTitle"		: title,
+		"username":    session.Values["username"],
+		"password":    session.Values["password"],
+		"isLogged":    session.Values["isLogin"],
+		"Oj":          "CF",
+		"PNum":        "1111",
+		"PName":       title,
+		"TimeLimit":   timeLimit,
+		"MemoryLimit": memoryLimit,
+		"pageTitle":   title,
 	}
 
 	// getting problem description
-	url := "https://vjudge.net"+dNum
+	url := "https://vjudge.net" + dNum
 	res, _ := rGET(url)
 
 	fmt.Printf(string(res))
