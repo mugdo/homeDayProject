@@ -22,3 +22,18 @@
 [submodule "golang.org/x/text"]
 	path = golang.org/x/text
 	url = https://github.com/golang/text.git
+[submodule "github.com/gocolly/colly/v2"]
+	path = github.com/gocolly/colly/v2
+	url = https://github.com/gocolly/colly
+[submodule "github.com/antchfx/htmlquery"]
+	path = github.com/antchfx/htmlquery
+	url = https://github.com/antchfx/htmlquery
+[submodule "github.com/antchfx/xmlquery"]
+	path = github.com/antchfx/xmlquery
+	url = https://github.com/antchfx/xmlquery
+[submodule "github.com/antchfx/xpath"]
+	path = github.com/antchfx/xpath
+	url = https://github.com/antchfx/xpath
+[submodule "github.com/gobwas/glob"]
+	path = github.com/gobwas/glob
+	url = https://github.com/gobwas/glob
