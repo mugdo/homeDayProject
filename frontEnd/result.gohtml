@@ -2,10 +2,8 @@
 
 <div id="content">
     <h2>Submission Result</h2>
-    <a href="/submit" id="submit">Submit</a>
 
-    <p id="url" style="color: blueviolet;">{{ .Res.URL }}</p>
-    <p id="subID">{{ .Res.SubID }}</p>
+    <p style="display: none;" id="url" style="color: blueviolet;">{{ .Res.URL }}{{ .Res.SubID }}</p>
     <p id="res">Submitting</p>
 </div>
 

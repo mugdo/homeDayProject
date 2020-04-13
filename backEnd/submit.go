@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func rLogin(username, password, apiURL string)([]byte, error){
+func rLogin(username, password, apiURL string) ([]byte, error) {
 	//fmt.Println("In rLogin")
 
 	//apiURL := "https://vjudge.net/user/login"
@@ -20,41 +20,29 @@ func rLogin(username, password, apiURL string)([]byte, error){
 	} else if apiURL == "https://vjudge.net/user/login" {
 		data.Set("username", username)
 	}
-	
+
 	data.Set("password", password)
 
 	return rPOST(apiURL, data)
 }
 
-func rSubmit()([]byte, error){
+func rSubmit(r *http.Request) ([]byte, error) {
 	//fmt.Println("In rSubmit")
-	
+
+	oj := r.FormValue("oj")
+	pNum := r.FormValue("pNum")
+	language := r.FormValue("language")
+	source := r.FormValue("source")
+
 	apiURL := "https://vjudge.net/problem/submit"
 
-	code := `#include<iostream>
-	using namespace std;
-	int main()
-	{
-		int test;
-		cin>>test;
-		for(int t=1;t<=test;t++)
-		{
-			int a,o;
-			cin>>a>>o;
-
-			cout<<"Case "<<t<<": "<<a+o<<endl;
-		}
-		return 0;
-	}
-			`
-
 	data := url.Values{}
-	data.Set("language", "C++")
+	data.Set("language", language)
 	data.Set("share", "0")
-	data.Set("source", code)
+	data.Set("source", source)
 	data.Set("captcha", "")
-	data.Set("oj", "LightOJ")
-	data.Set("probNum", "1000")
+	data.Set("oj", oj)
+	data.Set("probNum", pNum)
 
 	return rPOST(apiURL, data)
 }
@@ -137,15 +125,16 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 
 	if result == "success" {
 		//submit the code
-		body, err := rSubmit()
+		body, err := rSubmit(r)
 		if err != nil {
 			fmt.Println(err)
 		}
 
+		fmt.Println(string(body))
 		type result struct {
 			RunID int64 `json:"runId"`
 			SubID string
-			URL string
+			URL   string
 		}
 		var res result
 		json.Unmarshal(body, &res)
@@ -156,20 +145,20 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		//sending submission id to frontend for getting the verdict with ajax call
 		res.URL = "https://vjudge.net/solution/data/"
 		res.SubID = submissionID
-		fmt.Println(res.URL,res.SubID)
+		fmt.Println(res.URL, res.SubID)
 
 		session, _ := store.Get(r, "mysession")
 
 		if session.Values["isLogin"] == nil {
 			session.Values["isLogin"] = false
 		}
-	
+
 		data := map[string]interface{}{
-			"username"	: session.Values["username"],
-			"password"	: session.Values["password"],
-			"isLogged"	: session.Values["isLogin"],
-			"pageTitle"	: "Verdict",
-			"Res"		: res,
+			"username":  session.Values["username"],
+			"password":  session.Values["password"],
+			"isLogged":  session.Values["isLogin"],
+			"pageTitle": "Verdict",
+			"Res":       res,
 		}
 
 		tpl.ExecuteTemplate(w, "result.gohtml", data)

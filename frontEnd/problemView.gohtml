@@ -6,7 +6,8 @@
         <h3>{{.PName}}</h3>
         <p>Memory Limit : {{ .MemoryLimit }}</p>
         <p>Time Limit   : {{ .TimeLimit }}</p>
-        <p id="sub"><a href="/submission">Submit</a></p>
+        {{ $link := (printf "/submission/%s-%s" .Oj .PNum) }}
+        <p id="sub"><a href="{{ $link }}">Submit</a></p>
     </div>
     <div id="lowerContent">
         <div id="problemDescription">

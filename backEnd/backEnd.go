@@ -172,7 +172,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		pNum = string(runes[index+1:])
 	}
 
-	fmt.Println(oj,pNum)
+	fmt.Println(oj, pNum)
 	//fmt.Println("Scrap started")
 
 	title, timeLimit, memoryLimit, src := getTitle(oj, pNum)
@@ -504,20 +504,86 @@ func Result(w http.ResponseWriter, r *http.Request) {
 func TestPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
-	body, err := rLogin("ajudgebd", "aj199273", "https://vj.z180.cn")
-	if err != nil{
-		panic(err)
+	type LanguagePack struct {
+		LangValue int
+		LangName  string
 	}
-	res := string(body)
-	fmt.Fprint(w, res)
+	var languagePack []LanguagePack
+	oj := "CodeForces"
+	if oj == "CodeForces" {
+		languagePack = []LanguagePack{
+			LanguagePack{LangValue: 52, LangName: "Clang++17 Diagnostics"},
+			LanguagePack{LangValue: 9, LangName: "C# Mono 5.18"},
+			LanguagePack{LangValue: 28, LangName: "D DMD32 v2.091.0"},
+			LanguagePack{LangValue: 3, LangName: "Delphi 7"},
+			LanguagePack{LangValue: 4, LangName: "Free Pascal 3.0.2"},
+			LanguagePack{LangValue: 43, LangName: "GNU GCC C11 5.1.0"},
+			LanguagePack{LangValue: 42, LangName: "GNU G++11 5.1.0"},
+			LanguagePack{LangValue: 50, LangName: "GNU G++14 6.4.0"},
+			LanguagePack{LangValue: 54, LangName: "GNU G++17 7.3.0"},
+			LanguagePack{LangValue: 61, LangName: "GNU G++17 9.2.0 (64 bit, msys 2)"},
+			LanguagePack{LangValue: 32, LangName: "Go 1.14"},
+			LanguagePack{LangValue: 12, LangName: "Haskell GHC 8.6.3"},
+			LanguagePack{LangValue: 36, LangName: "Java 1.8.0_162"},
+			LanguagePack{LangValue: 60, LangName: "Java 11.0.5"},
+			LanguagePack{LangValue: 34, LangName: "JavaScript V8 4.8.0"},
+			LanguagePack{LangValue: 48, LangName: "Kotlin 1.3.70"},
+			LanguagePack{LangValue: 2, LangName: "Microsoft Visual C++ 2010"},
+			LanguagePack{LangValue: 59, LangName: "Microsoft Visual C++ 2017"},
+			LanguagePack{LangValue: 55, LangName: "Node.js 9.4.0"},
+			LanguagePack{LangValue: 19, LangName: "OCaml 4.02.1"},
+			LanguagePack{LangValue: 51, LangName: "PascalABC.NET 3.4.2"},
+			LanguagePack{LangValue: 13, LangName: "Perl 5.20.1"},
+			LanguagePack{LangValue: 6, LangName: "PHP 7.2.13"},
+			LanguagePack{LangValue: 40, LangName: "PyPy 2.7 (7.2.0)"},
+			LanguagePack{LangValue: 41, LangName: "PyPy 3.6 (7.2.0)"},
+			LanguagePack{LangValue: 7, LangName: "Python 2.7.15"},
+			LanguagePack{LangValue: 31, LangName: "Python 3.7.2"},
+			LanguagePack{LangValue: 8, LangName: "Ruby 2.0.0p645"},
+			LanguagePack{LangValue: 49, LangName: "Rust 1.42.0"},
+			LanguagePack{LangValue: 20, LangName: "Scala 2.12.8"},
+		}
+	}
+	fmt.Println(languagePack[0].LangName, languagePack[0].LangValue)
+	//return languagePack
 }
 func Submission(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
+	lastPage = ""
 
-	body, err := rLogin("ajudgebd", "aj199273", "https://vj.z180.cn")
-	if err != nil{
-		panic(err)
+	path := r.URL.Path
+	runes := []rune(path)
+	path = string(runes[12:])
+	fmt.Println(path)
+
+	need := "-"
+	index := strings.Index(path, need)
+	// fmt.Println("got Dash")
+	// fmt.Println(index)
+	var oj, pNum string
+	runes = []rune(path)
+	oj = string(runes[0:3])
+	if oj == "计蒜客" {
+		//oj = string(runes[0:3])
+		pNum = string(runes[4:])
+	} else {
+		oj = string(runes[0:index])
+		pNum = string(runes[index+1:])
 	}
-	res := string(body)
-	fmt.Fprint(w, res)
+	languagePack := getLenguage(oj)
+	session, _ := store.Get(r, "mysession")
+	data := map[string]interface{}{
+		"username":     session.Values["username"],
+		"password":     session.Values["password"],
+		"isLogged":     session.Values["isLogin"],
+		"pageTitle":    "Submission",
+
+		"Oj":           oj,
+		"PNum":         pNum,
+		"LanguagePack": languagePack,
+	}
+	fmt.Println("OJ:",oj)
+	fmt.Println("pNum:",pNum)
+	fmt.Println(languagePack[0].LangName)
+	tpl.ExecuteTemplate(w, "submission.gohtml", data)
 }
