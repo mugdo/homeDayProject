@@ -58,12 +58,67 @@ func getLenguage(oj string) []LanguagePack {
 			LanguagePack{LangValue: "26", LangName: "Secret_171"},
 			LanguagePack{LangValue: "57", LangName: "Text"},
 		}
+	} else if oj == "HackerRank" {
+		languagePack = []LanguagePack{
+			LanguagePack{LangValue: "ada", LangName: "ada"},
+			LanguagePack{LangValue: "bash", LangName: "bash"},
+			LanguagePack{LangValue: "c", LangName: "c"},
+			LanguagePack{LangValue: "clojure", LangName: "clojure"},
+			LanguagePack{LangValue: "coffeescript", LangName: "coffeescript"},
+			LanguagePack{LangValue: "cpp", LangName: "cpp"},
+			LanguagePack{LangValue: "cpp14", LangName: "cpp14"},
+			LanguagePack{LangValue: "csharp", LangName: "csharp"},
+			LanguagePack{LangValue: "d", LangName: "d"},
+			LanguagePack{LangValue: "elixir", LangName: "elixir"},
+			LanguagePack{LangValue: "erlang", LangName: "erlang"},
+			LanguagePack{LangValue: "fortran", LangName: "fortran"},
+			LanguagePack{LangValue: "fsharp", LangName: "fsharp"},
+			LanguagePack{LangValue: "go", LangName: "go"},
+			LanguagePack{LangValue: "groovy", LangName: "groovy"},
+			LanguagePack{LangValue: "haskell", LangName: "haskell"},
+			LanguagePack{LangValue: "java", LangName: "java"},
+			LanguagePack{LangValue: "java8", LangName: "java8"},
+			LanguagePack{LangValue: "javascript", LangName: "javascript"},
+			LanguagePack{LangValue: "julia", LangName: "julia"},
+			LanguagePack{LangValue: "lolcode", LangName: "lolcode"},
+			LanguagePack{LangValue: "lua", LangName: "lua"},
+			LanguagePack{LangValue: "objectivec", LangName: "objectivec"},
+			LanguagePack{LangValue: "ocaml", LangName: "ocaml"},
+			LanguagePack{LangValue: "octave", LangName: "octave"},
+			LanguagePack{LangValue: "pascal", LangName: "pascal"},
+			LanguagePack{LangValue: "perl", LangName: "perl"},
+			LanguagePack{LangValue: "php", LangName: "php"},
+			LanguagePack{LangValue: "pypy", LangName: "pypy"},
+			LanguagePack{LangValue: "pypy3", LangName: "pypy3"},
+			LanguagePack{LangValue: "python", LangName: "python"},
+			LanguagePack{LangValue: "python3", LangName: "python3"},
+			LanguagePack{LangValue: "r", LangName: "r"},
+			LanguagePack{LangValue: "racket", LangName: "racket"},
+			LanguagePack{LangValue: "ruby", LangName: "ruby"},
+			LanguagePack{LangValue: "rust", LangName: "rust"},
+			LanguagePack{LangValue: "sbcl", LangName: "sbcl"},
+			LanguagePack{LangValue: "scala", LangName: "scala"},
+			LanguagePack{LangValue: "smalltalk", LangName: "smalltalk"},
+			LanguagePack{LangValue: "swift", LangName: "swift"},
+			LanguagePack{LangValue: "tcl", LangName: "tcl"},
+			LanguagePack{LangValue: "visualbasic", LangName: "visualbasic"},
+			LanguagePack{LangValue: "whitespace", LangName: "whitespace"},
+		}
 	} else if oj == "LightOJ" {
 		languagePack = []LanguagePack{
 			LanguagePack{LangValue: "C", LangName: "C"},
 			LanguagePack{LangValue: "C++", LangName: "C++"},
 			LanguagePack{LangValue: "JAVA", LangName: "JAVA"},
 			LanguagePack{LangValue: "PASCAL", LangName: "PASCAL"},
+		}
+	} else if oj == "UVA" {
+		languagePack = []LanguagePack{
+			LanguagePack{LangValue: "1", LangName: "ANSI C 5.3.0"},
+			LanguagePack{LangValue: "3", LangName: "C++ 5.3.0"},
+			LanguagePack{LangValue: "5", LangName: "C++11 5.3.0"},
+			LanguagePack{LangValue: "2", LangName: "JAVA 1.8.0"},
+			LanguagePack{LangValue: "4", LangName: "PASCAL 3.0.0"},
+			LanguagePack{LangValue: "6", LangName: "PYTH3 3.5.1"},
 		}
 	}
 

@@ -11,12 +11,18 @@
     </div>
     <div id="lowerContent">
         <div id="problemDescription">
-
-        {{ range $i := .Problem }}
-            <h3>{{ .Title }}</h3>
-            <p>{{ .Content }}</p><br>
-        {{ end }}
-        
+            {{ if eq .Oj "UVA" }}
+                {{ $link := (printf "https://onlinejudge.org/external/%s/p%s.pdf" .Segment .PNum) }}
+                <center><iframe src="{{ $link }} " width= "70%" height= "1000px" frameborder= "0"></iframe></center>
+            {{ else if eq .Oj "UVALive" }}
+                {{ $link := (printf "https://icpcarchive.ecs.baylor.edu/external/%s/p%s.pdf" .Segment .PNum) }}
+                <center><iframe src="{{ $link }} " width= "70%" height= "1000px" frameborder= "0"></iframe></center>
+            {{ else }}
+                {{ range $i := .Problem }}
+                    <h3>{{ .Title }}</h3>
+                    <p>{{ .Content }}</p><br>
+                {{ end }}
+            {{ end }}
         </div>
     </div>
 </div>

@@ -4,12 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/gorilla/sessions"
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/gorilla/sessions"
 )
 
 var tpl *template.Template
@@ -20,6 +22,7 @@ func init() {
 
 var store = sessions.NewCookieStore([]byte("mysession"))
 var lastPage = ""
+var title, timeLimit, memoryLimit, src = "-", "-", "-", "-"
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -116,7 +119,7 @@ func getTimeLimit(body string) (a, b string) {
 	return sb, sbm
 }
 
-func getTitle(oj, pNum string) (a, b, c, d string) {
+func calculateTitle(oj, pNum string) {
 	fmt.Println("In GetTitle")
 	client := &http.Client{
 		Jar: cookieJar,
@@ -139,13 +142,12 @@ func getTitle(oj, pNum string) (a, b, c, d string) {
 	}
 
 	timeLimitText := document.Find("dl[class='card row']").Find("dd[class='col-sm-7']").Text()
-	timeLimit, memoryLimit := getTimeLimit(timeLimitText)
+	timeLimit, memoryLimit = getTimeLimit(timeLimitText)
 
-	title := document.Find("div[id='prob-title']").Find("h2").Text()
-	src, iv := document.Find("iframe").Attr("src")
+	title = document.Find("div[id='prob-title']").Find("h2").Text()
+	src, _ = document.Find("iframe").Attr("src")
 
-	fmt.Println("src=", src, "iv", iv)
-	return title, timeLimit, memoryLimit, src
+	//fmt.Println("src=", src, "iv", iv)
 }
 func ProblemView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html;charset=UTF-8")
@@ -175,7 +177,16 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(oj, pNum)
 	//fmt.Println("Scrap started")
 
-	title, timeLimit, memoryLimit, src := getTitle(oj, pNum)
+	calculateTitle(oj, pNum)
+
+	//for uva & uvalive pdf description
+	var segment string
+	if oj == "UVA" || oj == "UVALive" {
+		temp, _ := strconv.Atoi(pNum)
+
+		IntSegment := temp / 100
+		segment = strconv.Itoa(IntSegment)
+	}
 
 	// fmt.Println("After getting title ", title)
 	// fmt.Println("After getting TL ", timeLimit)
@@ -259,6 +270,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 
 		"Oj":          oj,
 		"PNum":        pNum,
+		"Segment":     segment,
 		"PName":       title,
 		"TimeLimit":   timeLimit,
 		"MemoryLimit": memoryLimit,
@@ -573,17 +585,17 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 	languagePack := getLenguage(oj)
 	session, _ := store.Get(r, "mysession")
 	data := map[string]interface{}{
-		"username":     session.Values["username"],
-		"password":     session.Values["password"],
-		"isLogged":     session.Values["isLogin"],
-		"pageTitle":    "Submission",
+		"username":  session.Values["username"],
+		"password":  session.Values["password"],
+		"isLogged":  session.Values["isLogin"],
+		"pageTitle": "Submission",
 
 		"Oj":           oj,
 		"PNum":         pNum,
+		"PName":        title,
+		"TimeLimit":    timeLimit,
+		"MemoryLimit":  memoryLimit,
 		"LanguagePack": languagePack,
 	}
-	fmt.Println("OJ:",oj)
-	fmt.Println("pNum:",pNum)
-	fmt.Println(languagePack[0].LangName)
 	tpl.ExecuteTemplate(w, "submission.gohtml", data)
 }
