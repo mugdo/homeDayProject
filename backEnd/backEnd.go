@@ -4,15 +4,16 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/gorilla/sessions"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/gorilla/sessions"
 )
 
 var tpl *template.Template
+
 func init() {
 	tpl = template.Must(template.ParseGlob("frontEnd/*/*"))
 }
@@ -39,7 +40,6 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "index.gohtml", data)
 }
-
 func Problem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	lastPage = "problem"
@@ -77,7 +77,6 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "problem.gohtml", data)
 }
-
 func ProblemView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html;charset=UTF-8")
 	lastPage = "problem"
@@ -455,7 +454,6 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 	}
 	tpl.ExecuteTemplate(w, "submission.gohtml", data)
 }
-
 func TestPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
@@ -500,5 +498,4 @@ func TestPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	fmt.Println(languagePack[0].LangName, languagePack[0].LangValue)
-	//return languagePack
 }

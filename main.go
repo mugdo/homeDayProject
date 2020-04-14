@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"backEnd"
-	"net/http"
+	"fmt"
 	"github.com/gorilla/mux"
+	"net/http"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	r.HandleFunc("/logout", backEnd.Logout)
 	r.HandleFunc("/register", backEnd.Register)
 	r.HandleFunc("/doRegister", backEnd.DoRegister)
-	
+
 	r.HandleFunc("/submit", backEnd.Submit)
 	r.PathPrefix("/submission").HandlerFunc(backEnd.Submission)
 	r.HandleFunc("/result", backEnd.Result)
@@ -37,8 +37,7 @@ func main() {
 	// r.HandleFunc("/toph", backEnd.Toph)
 	// r.HandleFunc("/des", backEnd.Des)
 	r.HandleFunc("/testpage", backEnd.TestPage)
-	
-	
+
 	//for serving javascripts & css files
 	r.PathPrefix("/assests/").Handler(http.StripPrefix("/assests/", http.FileServer(http.Dir("assests"))))
 

@@ -19,7 +19,6 @@ func rLogin(username, password, apiURL string) ([]byte, error) {
 
 	return rPOST(apiURL, data)
 }
-
 func rSubmit(r *http.Request) ([]byte, error) {
 	oj := r.FormValue("oj")
 	pNum := r.FormValue("pNum")
@@ -39,7 +38,6 @@ func rSubmit(r *http.Request) ([]byte, error) {
 
 	return rPOST(apiURL, data)
 }
-
 func Submit(w http.ResponseWriter, r *http.Request) {
 	//do login first
 	body, err := rLogin("ajudgebd", "aj199273", "https://vjudge.net/user/login")

@@ -31,7 +31,6 @@ func rGET(urlStr string) ([]byte, error) {
 
 	return body, err
 }
-
 func rPOST(urlStr string, data url.Values) ([]byte, error) {
 	req, err := http.NewRequest("POST", urlStr, strings.NewReader(data.Encode())) // URL-encoded payload
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
@@ -154,7 +153,6 @@ func getTimeMemory(body string) (string, string) {
 
 	return time, memory
 }
-
 func findPResource(OJ, pNum string) {
 	pURL := "https://vjudge.net/problem/" + OJ + "-" + pNum
 
