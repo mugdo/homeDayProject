@@ -8,9 +8,6 @@ import (
 	//"golang.org/x/net/html"
 )
 
-var client = &http.Client{
-	Jar: cookieJar,
-}
 var c = colly.NewCollector(
 //colly.AllowedDomains("localhost"),
 )

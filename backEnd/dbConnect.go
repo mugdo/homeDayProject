@@ -9,9 +9,9 @@ func dbConn() (db *sql.DB) {
 	dbUser := "root"
 	dbPass := ""
 	dbName := "ajudge"
+	
 	db, err := sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
-	if err != nil {
-		panic(err.Error())
-	}
+	checkErr(err)
+	
 	return db
 }

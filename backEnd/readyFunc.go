@@ -1,5 +1,178 @@
 package backEnd
 
+import (
+	"encoding/json"
+	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"io/ioutil"
+	"net/http"
+	"net/http/cookiejar"
+	"net/url"
+	"strconv"
+	"strings"
+)
+
+var cookieJar, _ = cookiejar.New(nil)
+var client = &http.Client{
+	Jar: cookieJar,
+}
+
+func checkErr(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
+func rGET(urlStr string) ([]byte, error) {
+	req, err := http.NewRequest("GET", urlStr, nil)
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	return body, err
+}
+
+func rPOST(urlStr string, data url.Values) ([]byte, error) {
+	req, err := http.NewRequest("POST", urlStr, strings.NewReader(data.Encode())) // URL-encoded payload
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	return body, err
+}
+
+func pSearch(oj, pNum, pName string) ([]byte, error) {
+	apiURL := "https://vjudge.net/problem/data"
+
+	data := url.Values{
+		"draw":                      {"1"},
+		"columns[0][data]":          {"0"},
+		"columns[1][data]":          {"1"},
+		"columns[2][data]":          {"2"},
+		"columns[3][data]":          {"3"},
+		"columns[4][data]":          {"4"},
+		"columns[5][data]":          {"5"},
+		"columns[6][data]":          {"6"},
+		"columns[0][name]":          {""},
+		"columns[1][name]":          {""},
+		"columns[2][name]":          {""},
+		"columns[3][name]":          {""},
+		"columns[4][name]":          {""},
+		"columns[5][name]":          {""},
+		"columns[6][name]":          {""},
+		"columns[0][searchable]":    {"true"},
+		"columns[1][searchable]":    {"true"},
+		"columns[2][searchable]":    {"false"},
+		"columns[3][searchable]":    {"true"},
+		"columns[4][searchable]":    {"true"},
+		"columns[5][searchable]":    {"true"},
+		"columns[6][searchable]":    {"true"},
+		"columns[0][orderable]":     {"false"},
+		"columns[1][orderable]":     {"true"},
+		"columns[2][orderable]":     {"false"},
+		"columns[3][orderable]":     {"true"},
+		"columns[4][orderable]":     {"true"},
+		"columns[5][orderable]":     {"true"},
+		"columns[6][orderable]":     {"false"},
+		"columns[0][search][value]": {""},
+		"columns[1][search][value]": {""},
+		"columns[2][search][value]": {""},
+		"columns[3][search][value]": {""},
+		"columns[4][search][value]": {""},
+		"columns[5][search][value]": {""},
+		"columns[6][search][value]": {""},
+		"columns[0][search][regex]": {"false"},
+		"columns[1][search][regex]": {"false"},
+		"columns[2][search][regex]": {"false"},
+		"columns[3][search][regex]": {"false"},
+		"columns[4][search][regex]": {"false"},
+		"columns[5][search][regex]": {"false"},
+		"columns[6][search][regex]": {"false"},
+		"order[0][column]":          {"5"},
+		"order[0][dir]":             {"desc"},
+		"search[value]":             {""},
+		"search[regex]":             {"false"},
+
+		"start":    {"0"},
+		"length":   {"20"},
+		"OJId":     {oj},
+		"probNum":  {pNum},
+		"title":    {pName},
+		"source":   {""},
+		"category": {"all"},
+	}
+
+	return rPOST(apiURL, data)
+}
+
+type Inner struct {
+	OriginOJ    string `json:"originOJ"`
+	OriginProb  string `json:"originProb"`
+	AllowSubmit bool   `json:"allowSubmit"`
+	ID          int64  `json:"id"`
+	Title       string `json:"title"`
+	TriggerTime int64  `json:"triggerTime"`
+	IsFav       int    `json:"isFav"`
+	Status      int    `json:"status"`
+}
+type searchResult struct {
+	Data            []Inner `json:"data"`
+	RecordsTotal    int     `json:"recordsTotal"`
+	RecordsFiltered int     `json:"recordsFiltered"`
+	Draw            int     `json:"draw"`
+}
+
+func getPList(body []byte) searchResult {
+	var res searchResult
+	json.Unmarshal(body, &res)
+
+	return res
+}
+
+func getTimeMemory(body string) (string, string) {
+	//getting time limit
+	need := "ms"
+	index1 := strings.Index(body, need)
+	runes := []rune(body)
+
+	time := "-"
+	if index1 != -1 {
+		time = string(runes[0 : index1+2])
+	}
+
+	//getting memory limit
+	need = "B"
+	index2 := strings.Index(body, need)
+
+	memory := "-"
+	if index2 != -1 {
+		memory = string(runes[index1+2 : index2+1])
+	}
+
+	return time, memory
+}
+
+func findPResource(OJ, pNum string) {
+	pURL := "https://vjudge.net/problem/" + OJ + "-" + pNum
+
+	req, err := http.NewRequest("GET", pURL, nil)
+	req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+	response, err := client.Do(req)
+	defer response.Body.Close()
+
+	document, err := goquery.NewDocumentFromReader(response.Body)
+	checkErr(err)
+
+	pTitle = document.Find("div[id='prob-title']").Find("h2").Text()
+	pDesSrc, _ = document.Find("iframe").Attr("src")
+
+	time_Memory := document.Find("dl[class='card row']").Find("dd[class='col-sm-7']").Text()
+	pTimeLimit, pMemoryLimit = getTimeMemory(time_Memory)
+}
+
 type LanguagePack struct {
 	LangValue string
 	LangName  string

@@ -5,31 +5,27 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gorilla/sessions"
 )
 
 var tpl *template.Template
-
 func init() {
-	tpl = template.Must(template.ParseGlob("frontEnd/*"))
+	tpl = template.Must(template.ParseGlob("frontEnd/*/*"))
 }
 
 var store = sessions.NewCookieStore([]byte("mysession"))
 var lastPage = ""
-var title, timeLimit, memoryLimit, src = "-", "-", "-", "-"
+var pTitle, pTimeLimit, pMemoryLimit, pDesSrc = "-", "-", "-", "-"
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	lastPage = "index"
 
 	session, _ := store.Get(r, "mysession")
-
 	if session.Values["isLogin"] == nil {
 		session.Values["isLogin"] = false
 	}
@@ -49,20 +45,16 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	lastPage = "problem"
 
 	session, _ := store.Get(r, "mysession")
-
 	if session.Values["isLogin"] == nil {
 		session.Values["isLogin"] = false
 	}
 
-	oj := r.FormValue("oj")
+	OJ := r.FormValue("oj")
 	pNum := r.FormValue("pNum")
 	pName := r.FormValue("pName")
 
-	body, err := pSearch(oj, pNum, pName)
-	if err != nil {
-		panic(err)
-	}
-	//fmt.Println(string(body))
+	body, err := pSearch(OJ, pNum, pName)
+	checkErr(err)
 
 	pList := getPList(body)
 	found := true
@@ -77,7 +69,7 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 		"isLogged":  session.Values["isLogin"],
 		"PList":     pList,
 		"Found":     found,
-		"Oj":        oj,
+		"Oj":        OJ,
 		"PNum":      pNum,
 		"PName":     pName,
 		"pageTitle": "Problem",
@@ -85,137 +77,51 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "problem.gohtml", data)
 }
-func getTimeLimit(body string) (a, b string) {
-	//fmt.Println(body)
 
-	need := "ms"
-
-	index := strings.Index(body, need)
-	fmt.Println("got Time")
-	fmt.Println(index)
-
-	runes := []rune(body)
-	sb := "-"
-	if index != -1 {
-		sb = string(runes[0 : index+2])
-	}
-	fmt.Println("Time Limit:", sb)
-
-	// if oj == "CodeChef" {
-	// 	need = "B"
-	// }
-	need = "B"
-	index2 := strings.Index(body, need)
-	fmt.Println("got Memory")
-	fmt.Println(index2)
-
-	//runes = []rune(body)
-	sbm := "-"
-	if index2 != -1 {
-		sbm = string(runes[index+2 : index2+1])
-	}
-	fmt.Println("Memory Limit:", sbm)
-
-	return sb, sbm
-}
-
-func calculateTitle(oj, pNum string) {
-	fmt.Println("In GetTitle")
-	client := &http.Client{
-		Jar: cookieJar,
-	}
-	pURL := "https://vjudge.net/problem/" + oj + "-" + pNum
-	// response, err := client.Get(pURL)
-	// if err != nil {
-	// 	log.Fatalln("Error fetching response. ", err)
-	// }
-	// defer response.Body.Close()
-
-	req, err := http.NewRequest("GET", pURL, nil)
-	req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-	response, err := client.Do(req)
-	defer response.Body.Close()
-
-	document, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		log.Fatal("Error loading HTTP response body. ", err)
-	}
-
-	timeLimitText := document.Find("dl[class='card row']").Find("dd[class='col-sm-7']").Text()
-	timeLimit, memoryLimit = getTimeLimit(timeLimitText)
-
-	title = document.Find("div[id='prob-title']").Find("h2").Text()
-	src, _ = document.Find("iframe").Attr("src")
-
-	//fmt.Println("src=", src, "iv", iv)
-}
 func ProblemView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html;charset=UTF-8")
 	lastPage = "problem"
 
 	path := r.URL.Path
 	runes := []rune(path)
-	path = string(runes[13:])
+	OJpNum := string(runes[13:])
 	fmt.Println(path)
 
 	need := "-"
-	index := strings.Index(path, need)
-	// fmt.Println("got Dash")
-	// fmt.Println(index)
-	var oj, pNum string
-	runes = []rune(path)
-	oj = string(runes[0:3])
+	index := strings.Index(OJpNum, need)
+	var OJ, pNum string
+	runes = []rune(OJpNum)
+	OJ = string(runes[0:3])
 
-	if oj == "计蒜客" {
-		//oj = string(runes[0:3])
+	if OJ == "计蒜客" {
 		pNum = string(runes[4:])
 	} else {
-		oj = string(runes[0:index])
+		OJ = string(runes[0:index])
 		pNum = string(runes[index+1:])
 	}
 
-	fmt.Println(oj, pNum)
-	//fmt.Println("Scrap started")
-
-	calculateTitle(oj, pNum)
+	//Finding problem Title, Time limit, Memory limit, Description source
+	findPResource(OJ, pNum)
 
 	//for uva & uvalive pdf description
 	var segment string
-	if oj == "UVA" || oj == "UVALive" {
+	if OJ == "UVA" || OJ == "UVALive" {
 		temp, _ := strconv.Atoi(pNum)
 
 		IntSegment := temp / 100
 		segment = strconv.Itoa(IntSegment)
 	}
 
-	// fmt.Println("After getting title ", title)
-	// fmt.Println("After getting TL ", timeLimit)
-	// fmt.Println("After getting ML ", memoryLimit)
-	// fmt.Println("After getting src ", src)
-	// fmt.Println("Finished Scrap")
-
 	// getting problem description///////////////
-	url := "https://vjudge.net" + src
-	// body, _ := rGET(url)
-	// fmt.Printf(string(body))
-	client := &http.Client{
-		Jar: cookieJar,
-	}
-	pURL := url
-	// response, err := client.Get(pURL)
-	// if err != nil {
-	// 	log.Fatalln("Error fetching response. ", err)
-	// }
-	// defer response.Body.Close()
+	pURL := "https://vjudge.net" + pDesSrc
 	req, err := http.NewRequest("GET", pURL, nil)
 	req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 	response, err := client.Do(req)
 	defer response.Body.Close()
 
 	document, err := goquery.NewDocumentFromReader(response.Body)
-	if err != nil {
-		log.Fatal("Error loading HTTP response body. ", err)
-	}
+	checkErr(err)
+
 	textArea := document.Find("textarea").Text()
 	fmt.Println("Textarea:::::::::::", textArea)
 	fmt.Println("Textarea:::::::::::")
@@ -266,16 +172,15 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		"username":  session.Values["username"],
 		"password":  session.Values["password"],
 		"isLogged":  session.Values["isLogin"],
-		"pageTitle": title,
+		"pageTitle": pTitle,
 
-		"Oj":          oj,
+		"Oj":          OJ,
 		"PNum":        pNum,
 		"Segment":     segment,
-		"PName":       title,
-		"TimeLimit":   timeLimit,
-		"MemoryLimit": memoryLimit,
+		"PName":       pTitle,
+		"TimeLimit":   pTimeLimit,
+		"MemoryLimit": pMemoryLimit,
 		"Problem":     problem,
-		//"ProblemContent": problemContent,
 	}
 
 	tpl.ExecuteTemplate(w, "problemView.gohtml", data)
@@ -513,6 +418,44 @@ func Result(w http.ResponseWriter, r *http.Request) {
 	}
 	tpl.ExecuteTemplate(w, "result.gohtml", data)
 }
+func Submission(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	lastPage = ""
+
+	path := r.URL.Path
+	runes := []rune(path)
+	OJpNum := string(runes[12:])
+
+	need := "-"
+	index := strings.Index(OJpNum, need)
+
+	var OJ, pNum string
+	runes = []rune(OJpNum)
+	OJ = string(runes[0:3])
+	if OJ == "计蒜客" {
+		pNum = string(runes[4:])
+	} else {
+		OJ = string(runes[0:index])
+		pNum = string(runes[index+1:])
+	}
+	languagePack := getLenguage(OJ)
+	session, _ := store.Get(r, "mysession")
+	data := map[string]interface{}{
+		"username":  session.Values["username"],
+		"password":  session.Values["password"],
+		"isLogged":  session.Values["isLogin"],
+		"pageTitle": "Submission",
+
+		"Oj":           OJ,
+		"PNum":         pNum,
+		"PName":        pTitle,
+		"TimeLimit":    pTimeLimit,
+		"MemoryLimit":  pMemoryLimit,
+		"LanguagePack": languagePack,
+	}
+	tpl.ExecuteTemplate(w, "submission.gohtml", data)
+}
+
 func TestPage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
@@ -558,44 +501,4 @@ func TestPage(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println(languagePack[0].LangName, languagePack[0].LangValue)
 	//return languagePack
-}
-func Submission(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	lastPage = ""
-
-	path := r.URL.Path
-	runes := []rune(path)
-	path = string(runes[12:])
-	fmt.Println(path)
-
-	need := "-"
-	index := strings.Index(path, need)
-	// fmt.Println("got Dash")
-	// fmt.Println(index)
-	var oj, pNum string
-	runes = []rune(path)
-	oj = string(runes[0:3])
-	if oj == "计蒜客" {
-		//oj = string(runes[0:3])
-		pNum = string(runes[4:])
-	} else {
-		oj = string(runes[0:index])
-		pNum = string(runes[index+1:])
-	}
-	languagePack := getLenguage(oj)
-	session, _ := store.Get(r, "mysession")
-	data := map[string]interface{}{
-		"username":  session.Values["username"],
-		"password":  session.Values["password"],
-		"isLogged":  session.Values["isLogin"],
-		"pageTitle": "Submission",
-
-		"Oj":           oj,
-		"PNum":         pNum,
-		"PName":        title,
-		"TimeLimit":    timeLimit,
-		"MemoryLimit":  memoryLimit,
-		"LanguagePack": languagePack,
-	}
-	tpl.ExecuteTemplate(w, "submission.gohtml", data)
 }
