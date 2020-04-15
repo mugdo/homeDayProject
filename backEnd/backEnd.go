@@ -174,7 +174,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	if tempList.Data[0].AllowSubmit == false {
 		allowSubmit = false
 	}
-	fmt.Println(allowSubmit)
+	
 	session, _ := store.Get(r, "mysession")
 	data := map[string]interface{}{
 		"username":  session.Values["username"],
