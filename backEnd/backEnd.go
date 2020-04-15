@@ -84,7 +84,6 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	runes := []rune(path)
 	OJpNum := string(runes[13:])
-	fmt.Println(path)
 
 	need := "-"
 	index := strings.Index(OJpNum, need)
@@ -122,11 +121,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	textArea := document.Find("textarea").Text()
-	fmt.Println("Textarea:::::::::::", textArea)
-	fmt.Println("Textarea:::::::::::")
-
 	b := []byte(textArea)
-	//fmt.Println("Byte:",b)
 
 	type Inner2 struct {
 		Format  string `json:"format"`
@@ -143,45 +138,35 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	var res Res
 	json.Unmarshal(b, &res)
 
-	//Eliminating Default CSS on Example-Input-Output
-	// need = "<script"
-
-	// index = strings.Index(res.Sections[0].Value.Content, need)
-	// fmt.Println("got Script")
-	// fmt.Println(index)
-
-	// if index != -1 {
-	// 	runes = []rune(res.Sections[0].Value.Content)
-	// 	res.Sections[0].Value.Content = string(runes[index:])
-	// }
-
 	problem := []map[string]interface{}{}
 
 	for i := 0; i < len(res.Sections); i++ {
+		//Eliminating Default CSS on Example-Input-Output
+		styleBody := res.Sections[i].Value.Content
+		content := removeStyle(styleBody)
 
 		mp := map[string]interface{}{
 			"Title":   template.HTML(res.Sections[i].Title),
-			"Content": template.HTML(res.Sections[i].Value.Content),
+			"Content": template.HTML(content),
 		}
 		problem = append(problem, mp)
 	}
 
 	//checking whether problem submission allowed or not
-	tempP, _ := pSearch(OJ,pNum,"")
+	tempP, _ := pSearch(OJ, pNum, "")
 	tempList := getPList(tempP)
 
 	allowSubmit := true
 	if tempList.Data[0].AllowSubmit == false {
 		allowSubmit = false
 	}
-	
+
 	session, _ := store.Get(r, "mysession")
 	data := map[string]interface{}{
-		"username":  session.Values["username"],
-		"password":  session.Values["password"],
-		"isLogged":  session.Values["isLogin"],
-		"pageTitle": pTitle,
-
+		"username":    session.Values["username"],
+		"password":    session.Values["password"],
+		"isLogged":    session.Values["isLogin"],
+		"pageTitle":   pTitle,
 		"Oj":          OJ,
 		"PNum":        pNum,
 		"AllowSubmit": allowSubmit,

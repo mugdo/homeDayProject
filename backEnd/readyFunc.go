@@ -171,6 +171,24 @@ func findPResource(OJ, pNum string) {
 	pTimeLimit, pMemoryLimit = getTimeMemory(time_Memory)
 }
 
+func removeStyle(styleBody string) string {
+	need1 := "<style"
+	index1 := strings.Index(styleBody, need1)
+	need2 := "</style>"
+	index2 := strings.Index(styleBody, need2)
+	runes := []rune(styleBody)
+
+	var part1, part2 string
+	if index1 != -1 {
+		part1 = string(runes[0:index1])
+		part2 = string(runes[index2+8:])
+
+		styleBody = part1 + part2
+	}
+
+	return styleBody
+}
+
 type LanguagePack struct {
 	LangValue string
 	LangName  string
