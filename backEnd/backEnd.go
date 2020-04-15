@@ -103,12 +103,12 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	findPResource(OJ, pNum)
 
 	//for uva & uvalive pdf description
-	var segment string
+	var uvaSegment string
 	if OJ == "UVA" || OJ == "UVALive" {
 		temp, _ := strconv.Atoi(pNum)
 
 		IntSegment := temp / 100
-		segment = strconv.Itoa(IntSegment)
+		uvaSegment = strconv.Itoa(IntSegment)
 	}
 
 	// getting problem description///////////////
@@ -166,6 +166,15 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		problem = append(problem, mp)
 	}
 
+	//checking whether problem submission allowed or not
+	tempP, _ := pSearch(OJ,pNum,"")
+	tempList := getPList(tempP)
+
+	allowSubmit := true
+	if tempList.Data[0].AllowSubmit == false {
+		allowSubmit = false
+	}
+	fmt.Println(allowSubmit)
 	session, _ := store.Get(r, "mysession")
 	data := map[string]interface{}{
 		"username":  session.Values["username"],
@@ -175,7 +184,8 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 
 		"Oj":          OJ,
 		"PNum":        pNum,
-		"Segment":     segment,
+		"AllowSubmit": allowSubmit,
+		"UvaSegment":  uvaSegment,
 		"PName":       pTitle,
 		"TimeLimit":   pTimeLimit,
 		"MemoryLimit": pMemoryLimit,

@@ -6,16 +6,21 @@
         <h3>{{.PName}}</h3>
         <p>Memory Limit : {{ .MemoryLimit }}</p>
         <p>Time Limit   : {{ .TimeLimit }}</p>
-        {{ $link := (printf "/submission/%s-%s" .Oj .PNum) }}
-        <p id="sub"><a href="{{ $link }}">Submit</a></p>
+
+        {{ if eq .AllowSubmit true }}
+            {{ $link := (printf "/submission/%s-%s" .Oj .PNum) }}
+            <p style="margin-top: 10px;"><a href="{{ $link }}" id="submitAllow">Submit</a></p>
+        {{ else }}
+            <p style="margin-top: 10px;"><a id="submitDisable" title="Submit is not Allowed for this problem. System Error.">Submit</a></p>
+        {{ end }}
     </div>
     <div id="lowerContent">
         <div id="problemDescription">
             {{ if eq .Oj "UVA" }}
-                {{ $link := (printf "https://onlinejudge.org/external/%s/p%s.pdf" .Segment .PNum) }}
+                {{ $link := (printf "https://onlinejudge.org/external/%s/p%s.pdf" .UvaSegment .PNum) }}
                 <center><iframe src="{{ $link }} " width= "70%" height= "1000px" frameborder= "0"></iframe></center>
             {{ else if eq .Oj "UVALive" }}
-                {{ $link := (printf "https://icpcarchive.ecs.baylor.edu/external/%s/p%s.pdf" .Segment .PNum) }}
+                {{ $link := (printf "https://icpcarchive.ecs.baylor.edu/external/%s/p%s.pdf" .UvaSegment .PNum) }}
                 <center><iframe src="{{ $link }} " width= "70%" height= "1000px" frameborder= "0"></iframe></center>
             {{ else }}
                 {{ range $i := .Problem }}

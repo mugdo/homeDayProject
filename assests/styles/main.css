@@ -211,15 +211,26 @@ body{
     text-align: center;
     height: 100px;
 }
-#sub{
-    margin-top: 10px;
-}
 #upperContent a{
-    border: 2px solid brown;
     padding: 3px;
     text-decoration: none;
-    font-weight: 800;
-    color: brown;
+    font-weight: 600;
+}
+#submitAllow{
+    color: white;
+    background-color: lightseagreen;
+    border: 2px solid seagreen;
+}
+#submitAllow:hover{
+    background-color: seagreen;
+}
+#submitDisable{
+    color: white;
+    background-color:coral;
+    border: 2px solid chocolate;
+}
+#submitDisable:hover{
+    background-color: chocolate;
 }
 #lowerContent{
     text-align: justify;
