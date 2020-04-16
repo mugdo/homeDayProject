@@ -20,7 +20,7 @@ func rLogin(username, password, apiURL string) ([]byte, error) {
 	return rPOST(apiURL, data)
 }
 func rSubmit(r *http.Request) ([]byte, error) {
-	oj := r.FormValue("oj")
+	OJ := r.FormValue("OJ")
 	pNum := r.FormValue("pNum")
 	language := r.FormValue("language")
 	source := r.FormValue("source")
@@ -32,7 +32,7 @@ func rSubmit(r *http.Request) ([]byte, error) {
 		"share":    {"0"},
 		"source":   {source},
 		"captcha":  {""},
-		"oj":       {oj},
+		"oj":       {OJ},
 		"probNum":  {pNum},
 	}
 

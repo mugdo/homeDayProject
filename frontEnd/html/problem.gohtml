@@ -5,7 +5,7 @@
     <table>
         <tr>
             <th>Status</td>
-            <th>Oj</th>
+            <th>OJ</th>
             <th>Prob Number</th>
             <th>Prob Name</th>
         </tr>
@@ -13,9 +13,9 @@
             <form action="/problem" method="POST">
                 <td></td>
                 <td>
-                    <select name="oj" placeholder="KKK">
-                        {{ if ne .Oj "" }}
-                            <option value="{{ .Oj }}">{{ .Oj }}</option>
+                    <select name="OJ">
+                        {{ if ne .OJ "" }}
+                            <option value="{{ .OJ }}">{{ .OJ }}</option>
                         {{ end }}
                         <option value="All">All</option>
                         <option value="51Nod">51Nod</option>

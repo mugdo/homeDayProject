@@ -43,7 +43,7 @@ func rPOST(urlStr string, data url.Values) ([]byte, error) {
 	return body, err
 }
 
-func pSearch(oj, pNum, pName string) ([]byte, error) {
+func pSearch(OJ, pNum, pName string) ([]byte, error) {
 	apiURL := "https://vjudge.net/problem/data"
 
 	data := url.Values{
@@ -97,7 +97,7 @@ func pSearch(oj, pNum, pName string) ([]byte, error) {
 
 		"start":    {"0"},
 		"length":   {"20"},
-		"OJId":     {oj},
+		"OJId":     {OJ},
 		"probNum":  {pNum},
 		"title":    {pName},
 		"source":   {""},
@@ -194,10 +194,10 @@ type LanguagePack struct {
 	LangName  string
 }
 
-func getLenguage(oj string) []LanguagePack {
+func getLanguage(OJ string) []LanguagePack {
 	var languagePack []LanguagePack
 
-	if oj == "CodeForces" {
+	if OJ == "CodeForces" {
 		languagePack = []LanguagePack{
 			LanguagePack{LangValue: "14", LangName: "ActiveTcl 8.5"},
 			LanguagePack{LangValue: "33", LangName: "Ada GNAT 4"},
@@ -247,7 +247,7 @@ func getLenguage(oj string) []LanguagePack {
 			LanguagePack{LangValue: "26", LangName: "Secret_171"},
 			LanguagePack{LangValue: "57", LangName: "Text"},
 		}
-	} else if oj == "HackerRank" {
+	} else if OJ == "HackerRank" {
 		languagePack = []LanguagePack{
 			LanguagePack{LangValue: "ada", LangName: "ada"},
 			LanguagePack{LangValue: "bash", LangName: "bash"},
@@ -293,14 +293,14 @@ func getLenguage(oj string) []LanguagePack {
 			LanguagePack{LangValue: "visualbasic", LangName: "visualbasic"},
 			LanguagePack{LangValue: "whitespace", LangName: "whitespace"},
 		}
-	} else if oj == "LightOJ" {
+	} else if OJ == "LightOJ" {
 		languagePack = []LanguagePack{
 			LanguagePack{LangValue: "C", LangName: "C"},
 			LanguagePack{LangValue: "C++", LangName: "C++"},
 			LanguagePack{LangValue: "JAVA", LangName: "JAVA"},
 			LanguagePack{LangValue: "PASCAL", LangName: "PASCAL"},
 		}
-	} else if oj == "UVA" {
+	} else if OJ == "UVA" {
 		languagePack = []LanguagePack{
 			LanguagePack{LangValue: "1", LangName: "ANSI C 5.3.0"},
 			LanguagePack{LangValue: "3", LangName: "C++ 5.3.0"},

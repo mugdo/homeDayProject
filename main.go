@@ -31,6 +31,7 @@ func main() {
 
 	r.HandleFunc("/submit", backEnd.Submit)
 	r.PathPrefix("/submission").HandlerFunc(backEnd.Submission)
+	r.PathPrefix("/lang").HandlerFunc(backEnd.GetLanguage)
 	r.HandleFunc("/result", backEnd.Result)
 
 	// r.HandleFunc("/scrap", backEnd.Scrap)
