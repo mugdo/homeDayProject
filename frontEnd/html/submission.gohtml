@@ -8,7 +8,7 @@
         <p>Time Limit   : {{ .TimeLimit }}</p>
     </div>
     <div id="lowerContent">
-        <form id="submit-form" action="/submit">
+        <form id="submit-form" action="/submit" method="POST">
             <div class="form-group">
                 <label >Problem:</label>
                 <p style="display: none;" id="OJReal">{{ .OJ }}</p>

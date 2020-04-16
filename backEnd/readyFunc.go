@@ -194,8 +194,16 @@ type LanguagePack struct {
 	LangName  string
 }
 
-func getLanguage(OJ string) []LanguagePack {
+func getLanguage(w http.ResponseWriter, r *http.Request) {
 	var languagePack []LanguagePack
+
+	path := r.URL.Path
+	need := "="
+	index := strings.Index(path, need)
+
+	var OJ string
+	runes := []rune(path)
+	OJ = string(runes[index+1:])
 
 	if OJ == "CodeForces" {
 		languagePack = []LanguagePack{
@@ -311,5 +319,7 @@ func getLanguage(OJ string) []LanguagePack {
 		}
 	}
 
-	return languagePack
+	w.Header().Set("Content-Type", "application/json")
+	b, _ := json.Marshal(languagePack)
+	w.Write(b)
 }
