@@ -3,12 +3,12 @@ package backEnd
 import (
 	"database/sql"
 	"encoding/json"
+	"github.com/PuerkitoBio/goquery"
+	"github.com/gorilla/sessions"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/gorilla/sessions"
 )
 
 var tpl *template.Template
@@ -77,7 +77,7 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "problem.gohtml", data)
 }
 func ProblemView(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html;charset=UTF-8")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	lastPage = "problem"
 
 	path := r.URL.Path
