@@ -155,9 +155,9 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	tempP, _ := pSearch(OJ, pNum, "")
 	tempList := getPList(tempP)
 
-	allowSubmit := true
-	if tempList.Data[0].AllowSubmit == false {
-		allowSubmit = false
+	allowSubmit := false
+	if tempList.Data[0].AllowSubmit == true && tempList.Data[0].Status == 0 {
+		allowSubmit = true
 	}
 
 	session, _ := store.Get(r, "mysession")
