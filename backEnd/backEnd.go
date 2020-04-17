@@ -3,12 +3,10 @@ package backEnd
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
-
 	"github.com/PuerkitoBio/goquery"
 	"github.com/gorilla/sessions"
 )
@@ -450,28 +448,4 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 }
 func GetLanguage(w http.ResponseWriter, r *http.Request) {
 	getLanguage(w, r)
-}
-func Test1(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "Hello")
-	tpl.ExecuteTemplate(w, "test.gohtml", nil)
-}
-func Test2(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	fmt.Fprintf(w, "Hello Res")
-
-	test := r.FormValue("test")
-	fmt.Println(test)
-
-	data := map[string]interface{}{
-		"Test": test,
-	}
-
-	tpl.ExecuteTemplate(w, "testPage.gohtml", data)
-}
-func TestSub(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	//fmt.Fprintf(w, "Hello")
-	//tpl.ExecuteTemplate(w, "test.gohtml", nil)
-	http.Redirect(w,r,"/testPage",http.StatusSeeOther)
 }
