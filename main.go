@@ -37,7 +37,9 @@ func main() {
 	// r.HandleFunc("/scrap", backEnd.Scrap)
 	// r.HandleFunc("/toph", backEnd.Toph)
 	// r.HandleFunc("/des", backEnd.Des)
-	r.HandleFunc("/testpage", backEnd.TestPage)
+	r.HandleFunc("/test2", backEnd.Test2)
+	r.HandleFunc("/test1", backEnd.Test1)
+	r.HandleFunc("/testSub", backEnd.TestSub)
 
 	//for serving javascripts & css files
 	r.PathPrefix("/assests/").Handler(http.StripPrefix("/assests/", http.FileServer(http.Dir("assests"))))
