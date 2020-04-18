@@ -4,22 +4,11 @@ import (
 	"database/sql"
 	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gorilla/sessions"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
 )
-
-var tpl *template.Template
-
-func init() {
-	tpl = template.Must(template.ParseGlob("frontEnd/*/*"))
-}
-
-var store = sessions.NewCookieStore([]byte("mysession"))
-var lastPage = ""
-var pTitle, pTimeLimit, pMemoryLimit, pDesSrc = "-", "-", "-", "-"
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -30,14 +19,14 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		session.Values["isLogin"] = false
 	}
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username":  session.Values["username"],
 		"password":  session.Values["password"],
 		"isLogged":  session.Values["isLogin"],
 		"pageTitle": "Homepage",
 	}
 
-	tpl.ExecuteTemplate(w, "index.gohtml", data)
+	tpl.ExecuteTemplate(w, "index.gohtml", Info)
 }
 func Problem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -62,7 +51,7 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 		found = false
 	}
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username":  session.Values["username"],
 		"password":  session.Values["password"],
 		"isLogged":  session.Values["isLogin"],
@@ -74,7 +63,7 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 		"pageTitle": "Problem",
 	}
 
-	tpl.ExecuteTemplate(w, "problem.gohtml", data)
+	tpl.ExecuteTemplate(w, "problem.gohtml", Info)
 }
 func ProblemView(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
@@ -161,7 +150,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, _ := store.Get(r, "mysession")
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username":    session.Values["username"],
 		"password":    session.Values["password"],
 		"isLogged":    session.Values["isLogin"],
@@ -176,7 +165,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		"Problem":     problem,
 	}
 
-	tpl.ExecuteTemplate(w, "problemView.gohtml", data)
+	tpl.ExecuteTemplate(w, "problemView.gohtml", Info)
 }
 func About(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -188,14 +177,14 @@ func About(w http.ResponseWriter, r *http.Request) {
 		session.Values["isLogin"] = false
 	}
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username":  session.Values["username"],
 		"password":  session.Values["password"],
 		"isLogged":  session.Values["isLogin"],
 		"pageTitle": "About",
 	}
 
-	tpl.ExecuteTemplate(w, "about.gohtml", data)
+	tpl.ExecuteTemplate(w, "about.gohtml", Info)
 }
 func Contact(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -207,14 +196,14 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 		session.Values["isLogin"] = false
 	}
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username":  session.Values["username"],
 		"password":  session.Values["password"],
 		"isLogged":  session.Values["isLogin"],
 		"pageTitle": "Contact",
 	}
 
-	tpl.ExecuteTemplate(w, "contact.gohtml", data)
+	tpl.ExecuteTemplate(w, "contact.gohtml", Info)
 }
 func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -224,10 +213,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if session.Values["isLogin"] == true {
 		http.Redirect(w, r, "/redirect", http.StatusSeeOther)
 	} else {
-		data := map[string]interface{}{
+		Info = map[string]interface{}{
 			"pageTitle": "Login",
 		}
-		tpl.ExecuteTemplate(w, "login.gohtml", data)
+		tpl.ExecuteTemplate(w, "login.gohtml", Info)
 	}
 }
 func LoginCheck(w http.ResponseWriter, r *http.Request) {
@@ -243,7 +232,7 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 
 	db := dbConn()
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username": username,
 	}
 
@@ -252,10 +241,10 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 	err := db.QueryRow("SELECT password FROM user WHERE username=?", username).Scan(&originalPassword)
 	if err == sql.ErrNoRows {
 		//username not found (found no rows)
-		data["errUsername"] = "No Account found with this username. Try again"
-		data["username"] = ""
+		Info["errUsername"] = "No Account found with this username. Try again"
+		Info["username"] = ""
 
-		tpl.ExecuteTemplate(w, "login.gohtml", data)
+		tpl.ExecuteTemplate(w, "login.gohtml", Info)
 	} else if err != nil {
 		panic(err.Error())
 	} else {
@@ -269,9 +258,9 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 
 			http.Redirect(w, r, "/redirect", http.StatusSeeOther)
 		} else {
-			data["errPassword"] = "Invalid password"
+			Info["errPassword"] = "Invalid password"
 
-			tpl.ExecuteTemplate(w, "login.gohtml", data)
+			tpl.ExecuteTemplate(w, "login.gohtml", Info)
 		}
 	}
 
@@ -313,10 +302,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	if session.Values["isLogin"] == true {
 		http.Redirect(w, r, "/redirect", http.StatusSeeOther)
 	} else {
-		data := map[string]interface{}{
+		Info = map[string]interface{}{
 			"pageTitle": "Registration",
 		}
-		tpl.ExecuteTemplate(w, "register.gohtml", data)
+		tpl.ExecuteTemplate(w, "register.gohtml", Info)
 	}
 }
 func DoRegister(w http.ResponseWriter, r *http.Request) {
@@ -335,7 +324,7 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 
 	db := dbConn()
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"fullName": fullName,
 		"email":    email,
 		"username": username,
@@ -346,11 +335,11 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	err1 := db.QueryRow("SELECT id FROM user WHERE email=?", email).Scan(&id)
 	if err1 == sql.ErrNoRows {
 		//email available (found no rows)
-		data["errEmail"] = ""
+		Info["errEmail"] = ""
 	} else if err1 != nil {
 		panic(err1.Error())
 	} else {
-		data["errEmail"] = "Email already registered. Choose another one"
+		Info["errEmail"] = "Email already registered. Choose another one"
 	}
 
 	//checking for username already exist or not
@@ -358,29 +347,29 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	err2 := db.QueryRow("SELECT id FROM user WHERE username=?", username).Scan(&id)
 	if err2 == sql.ErrNoRows {
 		//username available (found no rows)
-		data["errUsername"] = ""
+		Info["errUsername"] = ""
 	} else if err2 != nil {
 		panic(err2.Error())
 	} else {
-		data["errUsername"] = "Username already taken. Choose another one"
+		Info["errUsername"] = "Username already taken. Choose another one"
 	}
 	//checking for password & confirmPassword are same or not
 	if password == confirmPassword {
 		//passwords are same
-		data["errPassword"] = ""
+		Info["errPassword"] = ""
 	} else {
-		data["errPassword"] = "Password mismatched. Put cautiously"
+		Info["errPassword"] = "Password mismatched. Put cautiously"
 	}
 
 	//now do regitration
-	if data["errEmail"] != "" || data["errUsername"] != "" || data["errPassword"] != "" {
-		if data["errEmail"] != "" {
-			data["email"] = ""
+	if Info["errEmail"] != "" || Info["errUsername"] != "" || Info["errPassword"] != "" {
+		if Info["errEmail"] != "" {
+			Info["email"] = ""
 		}
-		if data["errUsername"] != "" {
-			data["username"] = ""
+		if Info["errUsername"] != "" {
+			Info["username"] = ""
 		}
-		tpl.ExecuteTemplate(w, "register.gohtml", data)
+		tpl.ExecuteTemplate(w, "register.gohtml", Info)
 	} else {
 		insertQuery, err := db.Prepare("INSERT INTO user(fullName, email, username, password, confirmPassword) VALUES(?,?,?,?,?)")
 		if err != nil {
@@ -398,18 +387,18 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 func PageNotFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"pageTitle": "Page Not Found",
 	}
-	tpl.ExecuteTemplate(w, "404.gohtml", data)
+	tpl.ExecuteTemplate(w, "404.gohtml", Info)
 }
 func Result(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"pageTitle": "Verdict",
 	}
-	tpl.ExecuteTemplate(w, "result.gohtml", data)
+	tpl.ExecuteTemplate(w, "result.gohtml", Info)
 }
 func Submission(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
@@ -433,7 +422,7 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 	}
 
 	session, _ := store.Get(r, "mysession")
-	data := map[string]interface{}{
+	Info = map[string]interface{}{
 		"username":    session.Values["username"],
 		"password":    session.Values["password"],
 		"isLogged":    session.Values["isLogin"],
@@ -444,7 +433,7 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 		"TimeLimit":   pTimeLimit,
 		"MemoryLimit": pMemoryLimit,
 	}
-	tpl.ExecuteTemplate(w, "submission.gohtml", data)
+	tpl.ExecuteTemplate(w, "submission.gohtml", Info)
 }
 func GetLanguage(w http.ResponseWriter, r *http.Request) {
 	getLanguage(w, r)

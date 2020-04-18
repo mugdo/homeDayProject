@@ -6,23 +6,16 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"net/http"
-	"net/http/cookiejar"
 	"net/url"
 	"strconv"
 	"strings"
 )
-
-var cookieJar, _ = cookiejar.New(nil)
-var client = &http.Client{
-	Jar: cookieJar,
-}
 
 func checkErr(err error) {
 	if err != nil {
 		fmt.Println(err)
 	}
 }
-
 func rGET(urlStr string) ([]byte, error) {
 	req, err := http.NewRequest("GET", urlStr, nil)
 	resp, err := client.Do(req)
@@ -42,7 +35,6 @@ func rPOST(urlStr string, data url.Values) ([]byte, error) {
 
 	return body, err
 }
-
 func pSearch(OJ, pNum, pName string) ([]byte, error) {
 	apiURL := "https://vjudge.net/problem/data"
 
@@ -106,31 +98,12 @@ func pSearch(OJ, pNum, pName string) ([]byte, error) {
 
 	return rPOST(apiURL, data)
 }
-
-type Inner struct {
-	OriginOJ    string `json:"originOJ"`
-	OriginProb  string `json:"originProb"`
-	AllowSubmit bool   `json:"allowSubmit"`
-	ID          int64  `json:"id"`
-	Title       string `json:"title"`
-	TriggerTime int64  `json:"triggerTime"`
-	IsFav       int    `json:"isFav"`
-	Status      int    `json:"status"`
-}
-type searchResult struct {
-	Data            []Inner `json:"data"`
-	RecordsTotal    int     `json:"recordsTotal"`
-	RecordsFiltered int     `json:"recordsFiltered"`
-	Draw            int     `json:"draw"`
-}
-
 func getPList(body []byte) searchResult {
 	var res searchResult
 	json.Unmarshal(body, &res)
 
 	return res
 }
-
 func getTimeMemory(body string) (string, string) {
 	//getting time limit
 	need := "ms"
@@ -170,7 +143,6 @@ func findPResource(OJ, pNum string) {
 	time_Memory := document.Find("dl[class='card row']").Find("dd[class='col-sm-7']").Text()
 	pTimeLimit, pMemoryLimit = getTimeMemory(time_Memory)
 }
-
 func removeStyle(styleBody string) string {
 	need1 := "<style"
 	index1 := strings.Index(styleBody, need1)
@@ -188,12 +160,6 @@ func removeStyle(styleBody string) string {
 
 	return styleBody
 }
-
-type LanguagePack struct {
-	LangValue string
-	LangName  string
-}
-
 func getLanguage(w http.ResponseWriter, r *http.Request) {
 	var languagePack []LanguagePack
 
