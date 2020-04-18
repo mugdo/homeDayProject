@@ -5,8 +5,8 @@
     console.log(url)
     $(document).ready(
         function () {
-            var counter = 0;
             var doCheck = setInterval(function () {    
+                var counter = 0;
                 $.getJSON(url, function (result) {
                     $('#res').text(result.status);
                     counter++;

@@ -8,16 +8,16 @@ import (
 )
 
 func rLogin(username, password, apiURL string) ([]byte, error) {
-	data := url.Values{}
+	postData := url.Values{}
 
 	if apiURL == "https://toph.co/login" {
-		data.Set("handle", username)
+		postData.Set("handle", username)
 	} else if apiURL == "https://vjudge.net/user/login" {
-		data.Set("username", username)
+		postData.Set("username", username)
 	}
-	data.Set("password", password)
+	postData.Set("password", password)
 
-	return rPOST(apiURL, data)
+	return rPOST(apiURL, postData)
 }
 func rSubmit(r *http.Request) ([]byte, error) {
 	OJ := r.FormValue("OJ")
@@ -27,7 +27,7 @@ func rSubmit(r *http.Request) ([]byte, error) {
 
 	apiURL := "https://vjudge.net/problem/submit"
 
-	data := url.Values{
+	postData := url.Values{
 		"language": {language},
 		"share":    {"0"},
 		"source":   {source},
@@ -36,7 +36,7 @@ func rSubmit(r *http.Request) ([]byte, error) {
 		"probNum":  {pNum},
 	}
 
-	return rPOST(apiURL, data)
+	return rPOST(apiURL, postData)
 }
 func Submit(w http.ResponseWriter, r *http.Request) {
 	//do login first
@@ -68,7 +68,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			session.Values["isLogin"] = false
 		}
 
-		data := map[string]interface{}{
+		Info = map[string]interface{}{
 			"username":  session.Values["username"],
 			"password":  session.Values["password"],
 			"isLogged":  session.Values["isLogin"],
@@ -76,6 +76,10 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			"Res":       res,
 		}
 
-		tpl.ExecuteTemplate(w, "result.gohtml", data)
+		http.Redirect(w, r, "/verdict", http.StatusSeeOther)
+		//tpl.ExecuteTemplate(w, "result.gohtml", data)
 	}
+}
+func Verdict(w http.ResponseWriter, r *http.Request) {
+	tpl.ExecuteTemplate(w, "verdict.gohtml", Info)
 }

@@ -11,7 +11,7 @@ import (
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	lastPage = "index"
 
 	session, _ := store.Get(r, "mysession")
@@ -29,7 +29,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "index.gohtml", Info)
 }
 func Problem(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	lastPage = "problem"
 
 	session, _ := store.Get(r, "mysession")
@@ -168,7 +168,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "problemView.gohtml", Info)
 }
 func About(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	lastPage = "about"
 
 	session, _ := store.Get(r, "mysession")
@@ -187,7 +187,7 @@ func About(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "about.gohtml", Info)
 }
 func Contact(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	lastPage = "contact"
 
 	session, _ := store.Get(r, "mysession")
@@ -206,7 +206,7 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "contact.gohtml", Info)
 }
 func Login(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	session, _ := store.Get(r, "mysession")
 
@@ -220,7 +220,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func LoginCheck(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -267,7 +267,7 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 }
 func Redirect(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	if lastPage == "problem" {
 		http.Redirect(w, r, "/problem", http.StatusSeeOther)
@@ -282,7 +282,7 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func Logout(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	session, _ := store.Get(r, "mysession")
 	session.Values["username"] = ""
@@ -295,7 +295,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 func Register(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	session, _ := store.Get(r, "mysession")
 
@@ -309,7 +309,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func DoRegister(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	if r.Method != "POST" {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -385,7 +385,7 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 }
 func PageNotFound(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	Info = map[string]interface{}{
 		"pageTitle": "Page Not Found",
@@ -393,7 +393,7 @@ func PageNotFound(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "404.gohtml", Info)
 }
 func Result(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	Info = map[string]interface{}{
 		"pageTitle": "Verdict",
@@ -401,8 +401,8 @@ func Result(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "result.gohtml", Info)
 }
 func Submission(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
-	lastPage = ""
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+	lastPage = "submission"
 
 	path := r.URL.Path
 	runes := []rune(path)
@@ -426,6 +426,7 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 		"username":    session.Values["username"],
 		"password":    session.Values["password"],
 		"isLogged":    session.Values["isLogin"],
+		"Lastpage":    lastPage,
 		"pageTitle":   "Submission",
 		"OJ":          OJ,
 		"PNum":        pNum,

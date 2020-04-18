@@ -37,6 +37,7 @@ func main() {
 	// r.HandleFunc("/scrap", backEnd.Scrap)
 	// r.HandleFunc("/toph", backEnd.Toph)
 	// r.HandleFunc("/des", backEnd.Des)
+	r.HandleFunc("/verdict", backEnd.Verdict)
 	r.HandleFunc("/test2", backEnd.Test2)
 	r.HandleFunc("/test1", backEnd.Test1)
 	r.HandleFunc("/testSub", backEnd.TestSub)
