@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 func rLogin(username, password, apiURL string) ([]byte, error) {
@@ -37,6 +38,45 @@ func rSubmit(r *http.Request) ([]byte, error) {
 	}
 
 	return rPOST(apiURL, postData)
+}
+func Submission(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+	lastPage = "submission"
+
+	path := r.URL.Path
+	runes := []rune(path)
+	OJpNum := string(runes[12:])
+
+	need := "-"
+	index := strings.Index(OJpNum, need)
+
+	var OJ, pNum string
+	runes = []rune(OJpNum)
+	OJ = string(runes[0:3])
+	if OJ == "计蒜客" {
+		pNum = string(runes[4:])
+	} else {
+		OJ = string(runes[0:index])
+		pNum = string(runes[index+1:])
+	}
+
+	session, _ := store.Get(r, "mysession")
+	Info = map[string]interface{}{
+		"username":    session.Values["username"],
+		"password":    session.Values["password"],
+		"isLogged":    session.Values["isLogin"],
+		"Lastpage":    lastPage,
+		"pageTitle":   "Submission",
+		"OJ":          OJ,
+		"PNum":        pNum,
+		"PName":       pTitle,
+		"TimeLimit":   pTimeLimit,
+		"MemoryLimit": pMemoryLimit,
+	}
+	tpl.ExecuteTemplate(w, "submission.gohtml", Info)
+}
+func GetLanguage(w http.ResponseWriter, r *http.Request) {
+	getLanguage(w, r)
 }
 func Submit(w http.ResponseWriter, r *http.Request) {
 	//do login first
@@ -81,5 +121,6 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func Verdict(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	tpl.ExecuteTemplate(w, "verdict.gohtml", Info)
 }

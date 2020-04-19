@@ -16,11 +16,8 @@ func main() {
 
 	//for serving perspective pages
 	r.HandleFunc("/", backEnd.Index)
-	r.HandleFunc("/problem", backEnd.Problem)
-	r.PathPrefix("/problemView").HandlerFunc(backEnd.ProblemView)
 	r.HandleFunc("/about", backEnd.About)
 	r.HandleFunc("/contact", backEnd.Contact)
-
 	r.HandleFunc("/redirect", backEnd.Redirect)
 
 	r.HandleFunc("/login", backEnd.Login)
@@ -29,15 +26,17 @@ func main() {
 	r.HandleFunc("/register", backEnd.Register)
 	r.HandleFunc("/doRegister", backEnd.DoRegister)
 
+	r.HandleFunc("/problem", backEnd.Problem)
+	r.PathPrefix("/problemView").HandlerFunc(backEnd.ProblemView)
+
 	r.HandleFunc("/submit", backEnd.Submit)
 	r.PathPrefix("/submission").HandlerFunc(backEnd.Submission)
 	r.PathPrefix("/lang").HandlerFunc(backEnd.GetLanguage)
-	r.HandleFunc("/result", backEnd.Result)
+	r.HandleFunc("/verdict", backEnd.Verdict)
 
 	// r.HandleFunc("/scrap", backEnd.Scrap)
 	// r.HandleFunc("/toph", backEnd.Toph)
 	// r.HandleFunc("/des", backEnd.Des)
-	r.HandleFunc("/verdict", backEnd.Verdict)
 	r.HandleFunc("/test2", backEnd.Test2)
 	r.HandleFunc("/test1", backEnd.Test1)
 	r.HandleFunc("/testSub", backEnd.TestSub)
