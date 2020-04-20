@@ -3,7 +3,9 @@ package backEnd
 import (
 	"database/sql"
 	"net/http"
+	"strings"
 )
+
 func Register(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
@@ -26,11 +28,11 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fullName := r.FormValue("fullName")
-	email := r.FormValue("email")
-	username := r.FormValue("username")
-	password := r.FormValue("password")
-	confirmPassword := r.FormValue("confirmPassword")
+	fullName := strings.TrimSpace(r.FormValue("fullName"))
+	email := strings.TrimSpace(r.FormValue("email"))
+	username := strings.TrimSpace(r.FormValue("username"))
+	password := strings.TrimSpace(r.FormValue("password"))
+	confirmPassword := strings.TrimSpace(r.FormValue("confirmPassword"))
 
 	db := dbConn()
 
@@ -41,28 +43,27 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//checking for email already exist or not
-	var id string
-	err1 := db.QueryRow("SELECT id FROM user WHERE email=?", email).Scan(&id)
+	var temp string
+	err1 := db.QueryRow("SELECT id FROM user WHERE email=?", email).Scan(&temp)
+	checkErr(err1)
 	if err1 == sql.ErrNoRows {
 		//email available (found no rows)
 		Info["errEmail"] = ""
-	} else if err1 != nil {
-		panic(err1.Error())
 	} else {
 		Info["errEmail"] = "Email already registered. Choose another one"
 	}
 
 	//checking for username already exist or not
-	id = ""
-	err2 := db.QueryRow("SELECT id FROM user WHERE username=?", username).Scan(&id)
+	temp = ""
+	err2 := db.QueryRow("SELECT id FROM user WHERE username=?", username).Scan(&temp)
+	checkErr(err2)
 	if err2 == sql.ErrNoRows {
 		//username available (found no rows)
 		Info["errUsername"] = ""
-	} else if err2 != nil {
-		panic(err2.Error())
 	} else {
 		Info["errUsername"] = "Username already taken. Choose another one"
 	}
+
 	//checking for password & confirmPassword are same or not
 	if password == confirmPassword {
 		//passwords are same
@@ -82,9 +83,7 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "register.gohtml", Info)
 	} else {
 		insertQuery, err := db.Prepare("INSERT INTO user(fullName, email, username, password, confirmPassword) VALUES(?,?,?,?,?)")
-		if err != nil {
-			panic(err.Error())
-		}
+		checkErr(err)
 		insertQuery.Exec(fullName, email, username, password, confirmPassword)
 		println("Registration Done")
 

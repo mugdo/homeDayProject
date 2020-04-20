@@ -3,6 +3,7 @@ package backEnd
 import (
 	"database/sql"
 	"net/http"
+	"strings"
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -27,8 +28,8 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	username := r.FormValue("username")
-	password := r.FormValue("password")
+	username := strings.TrimSpace(r.FormValue("username"))
+	password := strings.TrimSpace(r.FormValue("password"))
 
 	db := dbConn()
 
@@ -39,14 +40,13 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 	//checking for username really exist or not
 	var originalPassword string
 	err := db.QueryRow("SELECT password FROM user WHERE username=?", username).Scan(&originalPassword)
+	checkErr(err)
 	if err == sql.ErrNoRows {
 		//username not found (found no rows)
 		Info["errUsername"] = "No Account found with this username. Try again"
 		Info["username"] = ""
 
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
-	} else if err != nil {
-		panic(err.Error())
 	} else {
 		//no error on db.QueryRow (username found & original password achieved)
 		if password == originalPassword {
