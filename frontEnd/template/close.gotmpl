@@ -15,9 +15,11 @@
         </div>
         <script src="../assests/scripts/main.js"></script>
         {{ if eq .pageTitle "Verdict" }}
-            {{ template "verdictScript" }}
+            {{ template "verdictScript" . }}
         {{ else if eq .pageTitle "Submission" }}
-            {{ template "submissionScript" }}
+            {{ template "submissionScript" . }}
+        {{ else if eq .pageTitle "Registration" }}
+            {{ template "registerScript" . }}
         {{ end }}
     </body>
 </html>

@@ -1,0 +1,47 @@
+{{ define "registerScript" }}
+
+<script>
+    console.log("Script linked properly")
+
+    var email = $('#email')
+    var username = $('#username')
+    var password = $('#password')
+    var confirmPassword = $('#confirmPassword')
+
+    var errEmail = $('#errEmail')
+    var errUsername = $('#errUsername')
+    var errPassword = $('#errPassword')
+    
+    confirmPassword.on('blur', function() {
+        var pass = password.val()
+        var confirmPass = confirmPassword.val()
+        
+        if(pass!==confirmPass){
+            errPassword.text("Password mismatched. Put cautiously")
+        } else {
+            errPassword.text("")
+        }
+    });
+
+
+    {{/* function addLanguage(OJ) {
+        $.ajax({
+            url: "/lang="+OJ,
+            method: "GET",
+            success: function(data) {
+                console.log("success")
+                
+                $.each(data, function(key, value) {   
+                    languageBox.append($("<option></option>")
+                        .attr("value",value.LangValue)
+                        .text(value.LangName)); 
+                });
+            },
+        });
+    }; */}}
+
+    {{/* $(document).ready(function() {
+    }); */}}
+</script>
+
+{{ end }}
