@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 )
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
@@ -54,6 +55,12 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 			session.Values["password"] = password
 			session.Values["isLogin"] = true
 			session.Save(r, w)
+
+			Info = map[string]interface{}{
+				"username": session.Values["username"],
+				"password": session.Values["password"],
+				"isLogged": session.Values["isLogin"],
+			}
 
 			http.Redirect(w, r, "/redirect", http.StatusSeeOther)
 		} else {

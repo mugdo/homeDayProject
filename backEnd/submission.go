@@ -45,19 +45,22 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 
 	path := r.URL.Path
 	runes := []rune(path)
-	OJpNum := string(runes[12:])
+	var OJpNum, OJ, pNum string
+	
+	if len(path) > 11 { //if only "/submission" is received (without OJ & pNum)
+		OJpNum = string(runes[12:])
 
-	need := "-"
-	index := strings.Index(OJpNum, need)
+		need := "-"
+		index := strings.Index(OJpNum, need)
 
-	var OJ, pNum string
-	runes = []rune(OJpNum)
-	OJ = string(runes[0:3])
-	if OJ == "计蒜客" {
-		pNum = string(runes[4:])
-	} else {
-		OJ = string(runes[0:index])
-		pNum = string(runes[index+1:])
+		runes = []rune(OJpNum)
+		OJ = string(runes[0:3])
+		if OJ == "计蒜客" {
+			pNum = string(runes[4:])
+		} else {
+			OJ = string(runes[0:index])
+			pNum = string(runes[index+1:])
+		}
 	}
 
 	session, _ := store.Get(r, "mysession")
@@ -79,6 +82,10 @@ func GetLanguage(w http.ResponseWriter, r *http.Request) {
 	getLanguage(w, r)
 }
 func Submit(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/submission", http.StatusSeeOther)
+		return
+	}
 	//do login first
 	body, err := rLogin("ajudgebd", "aj199273", "https://vjudge.net/user/login")
 	checkErr(err)
