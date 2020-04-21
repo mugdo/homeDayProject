@@ -1,9 +1,13 @@
 package backEnd
 
 import (
-	"database/sql"
+	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
 	"net/http"
+	"net/smtp"
 	"strings"
+	"time"
 )
 
 func Register(w http.ResponseWriter, r *http.Request) {
@@ -20,6 +24,30 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "register.gohtml", Info)
 	}
 }
+
+func sendMail(email, link string) {
+	// Choose auth method and set it up
+	auth := smtp.PlainAuth("", "ajudge.bd", "aj199273", "smtp.gmail.com")
+
+	// Here we do it all: connect to our server, set up a message and send it
+	to := []string{email}
+	msg := []byte("To: " + email + "\r\n" +
+		"Subject: Ajudge Email verification\r\n" +
+		"\r\n" +
+		"Here’s the link of account activation. Click on the:\r\n" +
+		link)
+	err := smtp.SendMail("smtp.gmail.com:587", auth, "ajudge.bd@gmail.com", to, msg)
+	checkErr(err)
+}
+func generateToken() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+
+	hasher := md5.New()
+	hasher.Write(b)
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
 func DoRegister(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
@@ -32,64 +60,24 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	email := strings.TrimSpace(r.FormValue("email"))
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
-	confirmPassword := strings.TrimSpace(r.FormValue("confirmPassword"))
 
-	db := dbConn()
+	DB := dbConn()
 
-	Info = map[string]interface{}{
-		"fullName": fullName,
-		"email":    email,
-		"username": username,
-	}
+	//do regitration
+	CurrentTime := time.Now()
+	token := generateToken()
+	tokenPeriod := time.Now().Unix()
 
-	//checking for email already exist or not
-	var temp string
-	err1 := db.QueryRow("SELECT id FROM user WHERE email=?", email).Scan(&temp)
-	checkErr(err1)
-	if err1 == sql.ErrNoRows {
-		//email available (found no rows)
-		Info["errEmail"] = ""
-	} else {
-		Info["errEmail"] = "Email already registered. Choose another one"
-	}
+	insertQuery, err := DB.Prepare("INSERT INTO user(fullName, email, username, password, createdAt, isVerified, token, tokenPeriod) VALUES(?,?,?,?,?,?,?,?)")
+	checkErr(err)
+	insertQuery.Exec(fullName, email, username, password, CurrentTime, 0, token, tokenPeriod)
+	println("Registration Done")
 
-	//checking for username already exist or not
-	temp = ""
-	err2 := db.QueryRow("SELECT id FROM user WHERE username=?", username).Scan(&temp)
-	checkErr(err2)
-	if err2 == sql.ErrNoRows {
-		//username available (found no rows)
-		Info["errUsername"] = ""
-	} else {
-		Info["errUsername"] = "Username already taken. Choose another one"
-	}
+	link := "http://localhost:8080/verify-email/token=" + token
+	sendMail(email, link)
 
-	//checking for password & confirmPassword are same or not
-	if password == confirmPassword {
-		//passwords are same
-		Info["errPassword"] = ""
-	} else {
-		Info["errPassword"] = "Password mismatched. Put cautiously"
-	}
+	lastPage = "login"
+	http.Redirect(w, r, "/redirect", http.StatusSeeOther)
 
-	//now do regitration
-	if Info["errEmail"] != "" || Info["errUsername"] != "" || Info["errPassword"] != "" {
-		if Info["errEmail"] != "" {
-			Info["email"] = ""
-		}
-		if Info["errUsername"] != "" {
-			Info["username"] = ""
-		}
-		tpl.ExecuteTemplate(w, "register.gohtml", Info)
-	} else {
-		insertQuery, err := db.Prepare("INSERT INTO user(fullName, email, username, password, confirmPassword) VALUES(?,?,?,?,?)")
-		checkErr(err)
-		insertQuery.Exec(fullName, email, username, password, confirmPassword)
-		println("Registration Done")
-
-		lastPage = "login"
-		http.Redirect(w, r, "/redirect", http.StatusSeeOther)
-	}
-
-	defer db.Close()
+	defer DB.Close()
 }

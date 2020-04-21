@@ -2,7 +2,6 @@ package backEnd
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +12,8 @@ import (
 
 func checkErr(err error) {
 	if err != nil {
-		fmt.Println(err)
+		//fmt.Println(err)
+		panic(err)
 	}
 }
 func rGET(urlStr string) ([]byte, error) {

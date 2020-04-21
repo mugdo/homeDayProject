@@ -3,16 +3,44 @@
 <script>
     console.log("Script linked properly")
 
-    var email = $('#email')
     var username = $('#username')
+    var email = $('#email')
     var password = $('#password')
     var confirmPassword = $('#confirmPassword')
 
-    var errEmail = $('#errEmail')
     var errUsername = $('#errUsername')
+    var errEmail = $('#errEmail')
     var errPassword = $('#errPassword')
     
-    confirmPassword.on('blur', function() {
+    username.keyup( function() {
+        $.ajax({
+            url: "/check/username="+username.val().trim(),
+            method: "GET",
+            success: function(data) {
+                if(data=="true"){
+                    errUsername.text("Username already taken. Choose another one.")
+                } else {
+                    errUsername.text("")
+                }
+            },
+        });
+    });
+
+    email.keyup( function() {
+        $.ajax({
+            url: "/check/email="+email.val().trim(),
+            method: "GET",
+            success: function(data) {
+                if(data=="true"){
+                    errEmail.text("Email already registered. Choose another one.")
+                } else {
+                    errEmail.text("")
+                }
+            },
+        });
+    });
+
+    confirmPassword.keyup( function() {
         var pass = password.val()
         var confirmPass = confirmPassword.val()
         
@@ -23,22 +51,18 @@
         }
     });
 
-
-    {{/* function addLanguage(OJ) {
-        $.ajax({
-            url: "/lang="+OJ,
-            method: "GET",
-            success: function(data) {
-                console.log("success")
-                
-                $.each(data, function(key, value) {   
-                    languageBox.append($("<option></option>")
-                        .attr("value",value.LangValue)
-                        .text(value.LangName)); 
-                });
-            },
-        });
-    }; */}}
+    $('.form-group').keyup(function() {
+        var checkSubmit = setInterval(function() {
+            if(errUsername.text() === "" && errEmail.text() === "" && errPassword.text() === ""){
+                $('#submit').removeAttr('disabled');
+                $('#submit').removeAttr('Title');
+            } else {
+                $('#submit').attr('disabled', 'disabled');
+                $('#submit').attr('Title', 'Please fix the error.');
+            }           
+            clearInterval(checkSubmit)
+        }, 100);  
+    });
 
     {{/* $(document).ready(function() {
     }); */}}

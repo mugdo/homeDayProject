@@ -26,6 +26,8 @@ func main() {
 	r.HandleFunc("/register", backEnd.Register)
 	r.HandleFunc("/doRegister", backEnd.DoRegister)
 
+	r.PathPrefix("/check").HandlerFunc(backEnd.CheckDB)
+
 	r.HandleFunc("/problem", backEnd.Problem)
 	r.PathPrefix("/problemView").HandlerFunc(backEnd.ProblemView)
 
