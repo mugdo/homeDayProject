@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"encoding/hex"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"net/smtp"
 	"strings"
@@ -24,7 +25,10 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "register.gohtml", Info)
 	}
 }
-
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
 func sendMail(email, link string) {
 	// Choose auth method and set it up
 	auth := smtp.PlainAuth("", "ajudge.bd", "aj199273", "smtp.gmail.com")
@@ -36,7 +40,7 @@ func sendMail(email, link string) {
 		"\r\n" +
 		"Here’s the link of account activation. Click on the:\r\n" +
 		link)
-	err := smtp.SendMail("smtp.gmail.com:587", auth, "ajudge.bd@gmail.com", to, msg)
+	err := smtp.SendMail("smtp.gmail.com:587", auth, "ajudge Team", to, msg)
 	checkErr(err)
 }
 func generateToken() string {
@@ -60,6 +64,7 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	email := strings.TrimSpace(r.FormValue("email"))
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
+	password, _ = hashPassword(password)
 
 	DB := dbConn()
 

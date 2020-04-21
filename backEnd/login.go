@@ -2,6 +2,7 @@ package backEnd
 
 import (
 	"database/sql"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strings"
 )
@@ -20,6 +21,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
 	}
 }
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
+}
 func LoginCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
@@ -31,7 +36,7 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 	username := strings.TrimSpace(r.FormValue("username"))
 	password := strings.TrimSpace(r.FormValue("password"))
 
-	db := dbConn()
+	DB := dbConn()
 
 	Info = map[string]interface{}{
 		"username": username,
@@ -39,8 +44,8 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 
 	//checking for username really exist or not
 	var originalPassword string
-	err := db.QueryRow("SELECT password FROM user WHERE username=?", username).Scan(&originalPassword)
-	checkErr(err)
+	err := DB.QueryRow("SELECT password FROM user WHERE username=?", username).Scan(&originalPassword)
+
 	if err == sql.ErrNoRows {
 		//username not found (found no rows)
 		Info["errUsername"] = "No Account found with this username. Try again"
@@ -49,7 +54,7 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
 	} else {
 		//no error on db.QueryRow (username found & original password achieved)
-		if password == originalPassword {
+		if checkPasswordHash(password, originalPassword) {
 			session, _ := store.Get(r, "mysession")
 			session.Values["username"] = username
 			session.Values["password"] = password
@@ -70,7 +75,7 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	defer db.Close()
+	defer DB.Close()
 }
 func Logout(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
