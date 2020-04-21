@@ -55,3 +55,6 @@
 [submodule "github.com/golang/groupcache"]
 	path = github.com/golang/groupcache
 	url = https://github.com/golang/groupcache
+[submodule "golang.org/x/crypto"]
+	path = golang.org/x/crypto
+	url = https://github.com/golang/crypto.git
