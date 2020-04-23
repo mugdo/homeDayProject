@@ -132,3 +132,31 @@ func SendToken(w http.ResponseWriter, r *http.Request) {
 
 	defer DB.Close()
 }
+func ResetPassword(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	email := strings.TrimSpace(r.FormValue("email"))
+	DB := dbConn()
+
+	//updating DB with new token
+	token := generateToken()
+	tokenPeriod := time.Now().Unix()
+
+	insertQuery, err := DB.Prepare("UPDATE user SET token=?,tokenPeriod=? WHERE email=?")
+	checkErr(err)
+	insertQuery.Exec(token,tokenPeriod,email)
+	println("Token Updated")
+
+	link := "http://localhost:8080/verify-email/token=" + token
+	sendMail(email, link)
+
+	lastPage = "tokenRequest"
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+
+	defer DB.Close()
+}
