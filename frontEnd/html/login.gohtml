@@ -18,6 +18,50 @@
             <span><a href="/reset">Forgot Password?</a></span>
         </form>
     </div>
+    <div id="popUp">
+        {{ if eq .LastPage "RegistrationDone" }}
+        <div class="popup-wrap">
+            <div class="popup-box">
+                <h2>Registration Successful</h2>
+                <h3>A verification link was sent to your provided email. Go to the link for email verification.</h3>
+                <h3>The link will expire in 2 hours.</h3>
+                <a class="close-btn popup-close" href="#">x</a>
+            </div>
+        </div>
+        {{ else if eq .LastPage "tokenInvalid"}}
+        <div class="popup-wrap">
+            <div class="popup-box">
+                <h2>Invalid Token</h2>
+                <h3><a href="">Request</a> for a new Token</h3>
+                <a class="close-btn popup-close" href="#">x</a>
+            </div>
+        </div>
+        {{ else if eq .LastPage "tokenAlreadyVerified"}}
+        <div class="popup-wrap">
+            <div class="popup-box">
+                <h2>Your Email Already Verified.</h2>
+                <h3>Login to your account & enjoy your journey with us.</h3>
+                <a class="close-btn popup-close" href="#">x</a>
+            </div>
+        </div>
+        {{ else if eq .LastPage "tokenExpired"}}
+        <div class="popup-wrap">
+            <div class="popup-box">
+                <h2>Token Expired</h2>
+                <h3><a href="">Request</a> for a new Token</h3>
+                <a class="close-btn popup-close" href="#">x</a>
+            </div>
+        </div>
+        {{ else if eq .LastPage "tokenVerifiedNow"}}
+        <div class="popup-wrap">
+            <div class="popup-box">
+                <h2>Email Verified</h2>
+                <h3>Login to your account & enjoy your journey with us.</h3>
+                <a class="close-btn popup-close" href="#">x</a>
+            </div>
+        </div>
+        {{ end }}
+    </div>
 </div>
 
 {{ template "close" . }}

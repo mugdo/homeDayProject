@@ -20,6 +20,10 @@
             {{ template "submissionScript" . }}
         {{ else if eq .pageTitle "Registration" }}
             {{ template "registerScript" . }}
+        {{ else if and (eq .pageTitle "Login") (or (or (eq .LastPage "tokenInvalid") (eq .LastPage "tokenAlreadyVerified")) (or (eq .LastPage "tokenExpired") (eq .LastPage "tokenVerifiedNow")) ) }}
+            {{ template "popUpLoginScript" . }}
+        {{ else if and (eq .pageTitle "Homepage") (or (or (eq .LastPage "tokenInvalid") (eq .LastPage "tokenAlreadyVerified")) (or (eq .LastPage "tokenExpired") (eq .LastPage "tokenVerifiedNow")) ) }}
+            {{ template "popUpLoginScript" . }}
         {{ end }}
     </body>
 </html>

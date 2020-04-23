@@ -81,8 +81,17 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	link := "http://localhost:8080/verify-email/token=" + token
 	sendMail(email, link)
 
-	lastPage = "login"
-	http.Redirect(w, r, "/redirect", http.StatusSeeOther)
+	lastPage = "RegistrationDone"
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 
 	defer DB.Close()
+}
+func PopUpLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+
+	Info = map[string]interface{}{
+		"pageTitle": "Login",
+		"LastPage" : lastPage,
+	}
+	tpl.ExecuteTemplate(w, "popUpLogin.gohtml", Info)
 }

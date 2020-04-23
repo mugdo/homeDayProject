@@ -78,7 +78,7 @@ func Test1(w http.ResponseWriter, r *http.Request) {
 }
 func Test2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprintf(w, "Hello Res")
+	//fmt.Fprintf(w, "Hello Res")
 
 	// test := r.FormValue("test")
 	// fmt.Println(test)

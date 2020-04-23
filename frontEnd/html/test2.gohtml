@@ -1,82 +1,37 @@
-<div class="header">
-    <div class="title">D. Optical Experiment</div>
-    <div class="time-limit">
-        <div class="property-title">time limit per test</div>5 seconds
-    </div>
-    <div class="memory-limit">
-        <div class="property-title">memory limit per test</div>256 megabytes
-    </div>
-    <div class="input-file">
-        <div class="property-title">input</div>standard input
-    </div>
-    <div class="output-file">
-        <div class="property-title">output</div>standard output
-    </div>
+<html>
+<head>
+  <link rel="stylesheet" href="assests/styles/main.css" type="text/css">
+  <script src="../assests/scripts/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<div class="main">
+  <h1>An Animated Lil' Popup</h1>
+  <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Proin non rhoncus diam, a porta diam! Nunc ultricies risus quis convallis consequat! Phasellus dapibus tortor eu finibus tempor. Sed ut malesuada turpis, vitae luctus nisi. Suspendisse vitae libero sed libero eleifend convallis.</p>
+  <a class="btn popup-btn" href="#">Click Me!</a>
 </div>
-<div>
-    <p>Professor Phunsuk Wangdu has performed some experiments on rays.
-        The setup for <span class="tex-span"> <i>n</i></span> rays is as follows.
-    </p>
-    <p>There is a rectangular box having exactly <span class="tex-span"> <i>n</i></span> holes on the opposite faces.
-        All rays enter from the holes of the first side and exit from the holes of the other side of the box. Exactly
-        one ray can enter or exit from each hole. The holes are in a straight line.</p>
-    <center> <img class="tex-graphics"
-            src="https://espresso.codeforces.com/28583bedfa0495c0d7b4821b0712ee974a30bb9e.png"
-            style="max-width: 100.0%;max-height: 100.0%;" /></center>
-    <p>Professor Wangdu is showing his experiment to his students. He shows that there are cases, when all the rays are
-        intersected by every other ray. A curious student asked the professor: &quot;Sir, there are some groups of rays
-        such that all rays in that group intersect every other ray in that group. Can we determine the number of rays in
-        the largest of such groups?&quot;.</p>
-    <p>Professor Wangdu now is in trouble and knowing your intellect he asks you to help him.</p>
+<div class="popup-wrap">
+  <div class="popup-box">
+    <h2>Title of Popup</h2>
+    <h3>A sub-heading for the popup with a little description.</h3>
+    <a class="close-btn popup-close" href="#">x</a>
+  </div>
 </div>
-<div class="input-specification">
-    <div class="section-title">Input</div>
-    <p>The first line contains <span class="tex-span"> <i>n</i></span> (<span class="tex-span">1 ≤ <i>n</i> ≤ 10<sup
-                class="upper-index">6</sup></span>), the number of rays. The second line contains <span
-            class="tex-span"> <i>n</i></span> distinct integers. The <span class="tex-span"> <i>i</i></span>-th integer
-        <span class="tex-span">
-            <i>x</i> <sub class="lower-index"> <i>i</i></sub></span> (<span class="tex-span">1 ≤ <i>x</i> <sub
-                class="lower-index"> <i>i</i></sub> ≤ <i>n</i></span>) shows that the <span class="tex-span"> <i>x</i>
-            <sub class="lower-index">
-                <i>i</i></sub></span>-th ray enters from the <span class="tex-span"> <i>i</i></span>-th hole. Similarly,
-        third line contains <span class="tex-span"> <i>n</i></span> distinct integers. The <span class="tex-span">
-            <i>i</i></span>-th integer <span class="tex-span"> <i>y</i> <sub class="lower-index"> <i>i</i></sub></span>
-        (<span class="tex-span">1 ≤ <i>y</i> <sub class="lower-index"> <i>i</i></sub> ≤ <i>n</i></span>) shows that the
-        <span class="tex-span"> <i>y</i> <sub class="lower-index"> <i>i</i></sub></span>-th ray exits from the <span
-            class="tex-span"> <i>i</i></span>-th hole. All rays are numbered from <span class="tex-span">1</span> to
-        <span class="tex-span"> <i>n</i></span>. </p>
-</div>
-<div class="output-specification">
-    <div class="section-title">Output</div>
-    <p>Output contains the only integer which is the number of rays in the largest group of rays all of which intersect
-        each other.</p>
-</div>
-<div class="sample-tests">
-    <div class="section-title">Examples</div>
-    <div class="sample-test">
-        <div class="input">
-            <div class="title">Input</div>
-            <pre>5<br />1 4 5 2 3<br />3 4 2 1 5<br /></pre>
-        </div>
-        <div class="output">
-            <div class="title">Output</div>
-            <pre>3<br /></pre>
-        </div>
-        <div class="input">
-            <div class="title">Input</div>
-            <pre>3<br />3 1 2<br />2 3 1<br /></pre>
-        </div>
-        <div class="output">
-            <div class="title">Output</div>
-            <pre>2<br /></pre>
-        </div>
-    </div>
-</div>
-<div class="note">
-    <div class="section-title">Note</div>
-    <p>For the first test case, the figure is shown above. The output of the first test case is 3, since the rays number
-        1, 4 and 3 are the ones which are intersected by each other one i.e. 1 is intersected by 4 and 3, 3 is
-        intersected by 4 and 1, and 4 is intersected by 1 and 3. Hence every ray in this group is intersected by each
-        other one. There does not exist any group containing more than 3 rays satisfying the above-mentioned constraint.
-    </p>
-</div>
+  <script>
+  $(document).ready(function() {
+    $('.popup-btn').click(function(e) {
+      $('.popup-wrap').fadeIn(500);
+      $('.popup-box').removeClass('transform-out').addClass('transform-in');
+
+      e.preventDefault();
+    });
+
+    $('.popup-close').click(function(e) {
+      $('.popup-wrap').fadeOut(500);
+      $('.popup-box').removeClass('transform-in').addClass('transform-out');
+
+      e.preventDefault();
+    });
+  });
+</script>
+</body>
+</html>

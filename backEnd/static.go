@@ -6,7 +6,10 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	lastPage = "index"
+	
+	if lastPage != "tokenInvalid" && lastPage != "tokenAlreadyVerified" && lastPage != "tokenExpired" && lastPage != "tokenVerifiedNow" {
+		lastPage = "index"
+	}
 
 	session, _ := store.Get(r, "mysession")
 	if session.Values["isLogin"] == nil {
@@ -17,10 +20,12 @@ func Index(w http.ResponseWriter, r *http.Request) {
 		"username":  session.Values["username"],
 		"password":  session.Values["password"],
 		"isLogged":  session.Values["isLogin"],
+		"LastPage":  lastPage,
 		"pageTitle": "Homepage",
 	}
 
 	tpl.ExecuteTemplate(w, "index.gohtml", Info)
+	lastPage = "index"
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
