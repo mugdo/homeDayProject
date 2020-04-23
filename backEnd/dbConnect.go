@@ -89,9 +89,9 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
 			} else {
 				verifiedTime := strconv.FormatInt(nowPeriod, 10)
-				updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenPeriod=" + verifiedTime + " WHERE token=?")
+				updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenPeriod=? WHERE token=?")
 				checkErr(err)
-				updateQuery.Exec(token)
+				updateQuery.Exec(verifiedTime,token)
 
 				lastPage = "tokenVerifiedNow"
 				http.Redirect(w, r, "/login", http.StatusSeeOther)

@@ -86,12 +86,49 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 
 	defer DB.Close()
 }
-func PopUpLogin(w http.ResponseWriter, r *http.Request) {
+func TokenRequest(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
-	Info = map[string]interface{}{
-		"pageTitle": "Login",
-		"LastPage" : lastPage,
+	session, _ := store.Get(r, "mysession")
+
+	if session.Values["isLogin"] == true {
+		http.Redirect(w, r, "/redirect", http.StatusSeeOther)
+	} else {
+		Info = map[string]interface{}{
+			"username":  session.Values["username"],
+			"password":  session.Values["password"],
+			"isLogged":  session.Values["isLogin"],
+			"LastPage":  lastPage,
+			"pageTitle": "New Token Request",
+		}
+		tpl.ExecuteTemplate(w, "tokenRequest.gohtml", Info)
 	}
-	tpl.ExecuteTemplate(w, "popUpLogin.gohtml", Info)
+}
+func SendToken(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+
+	if r.Method != "POST" {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	email := strings.TrimSpace(r.FormValue("email"))
+	DB := dbConn()
+
+	//updating DB with new token
+	token := generateToken()
+	tokenPeriod := time.Now().Unix()
+
+	insertQuery, err := DB.Prepare("UPDATE user SET token=?,tokenPeriod=? WHERE email=?")
+	checkErr(err)
+	insertQuery.Exec(token,tokenPeriod,email)
+	println("Token Updated")
+
+	link := "http://localhost:8080/verify-email/token=" + token
+	sendMail(email, link)
+
+	lastPage = "tokenRequest"
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+
+	defer DB.Close()
 }

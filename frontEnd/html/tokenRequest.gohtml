@@ -1,0 +1,51 @@
+{{ template "head" . }}
+
+<div id="content">
+    <form id="registrationForm" action="/sendToken" method="post">
+        <h1>New Token Request</h1>
+        <div class="form-group">
+            <label for="email">Email :</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{.email}}" required><br>
+            <span style="color: red;" id="errEmail"></span>
+        </div>
+        <div class="form-group">
+            <input type="reset" name="reset" value="Reset">
+            <input type="submit" name="register" value="Request" id="submit">
+        </div>
+    </form>
+    <script>
+        console.log("Script linked properly")
+
+        var email = $('#email')
+        var errEmail = $('#errEmail')
+
+        email.keyup( function() {
+            $.ajax({
+                url: "/check/email="+email.val().trim(),
+                method: "GET",
+                success: function(data) {
+                    if(data=="true"){
+                        errEmail.text("")
+                    } else {
+                        errEmail.text("No account found with this email. Enter correct one.")
+                    }
+                },
+            });
+        });
+
+        $('.form-group').keyup(function() {
+            var checkSubmit = setInterval(function() {
+                if(errEmail.text() === ""){
+                    $('#submit').removeAttr('disabled');
+                    $('#submit').removeAttr('Title');
+                } else {
+                    $('#submit').attr('disabled', 'disabled');
+                    $('#submit').attr('Title', 'Please fix the error.');
+                }           
+                clearInterval(checkSubmit)
+            }, 100);  
+        });
+    </script>
+</div>
+
+{{ template "close" . }}

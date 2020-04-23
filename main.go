@@ -25,10 +25,11 @@ func main() {
 	r.HandleFunc("/logout", backEnd.Logout)
 	r.HandleFunc("/register", backEnd.Register)
 	r.HandleFunc("/doRegister", backEnd.DoRegister)
-	r.HandleFunc("/popUpLogin", backEnd.PopUpLogin)
 
 	r.PathPrefix("/check").HandlerFunc(backEnd.CheckDB)
 	r.PathPrefix("/verify-email").HandlerFunc(backEnd.EmailVerifiation)
+	r.HandleFunc("/tokenRequest", backEnd.TokenRequest)
+	r.HandleFunc("/sendToken", backEnd.SendToken)
 
 	r.HandleFunc("/problem", backEnd.Problem)
 	r.PathPrefix("/problemView").HandlerFunc(backEnd.ProblemView)
