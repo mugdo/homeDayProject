@@ -65,11 +65,11 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "mysession")
 	Info = map[string]interface{}{
-		"username":    session.Values["username"],
-		"password":    session.Values["password"],
-		"isLogged":    session.Values["isLogin"],
+		"Username":    session.Values["username"],
+		"Password":    session.Values["password"],
+		"IsLogged":    session.Values["isLogin"],
 		"Lastpage":    lastPage,
-		"pageTitle":   "Submission",
+		"PageTitle":   "Submission",
 		"OJ":          OJ,
 		"PNum":        pNum,
 		"PName":       pTitle,
@@ -116,10 +116,10 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 		}
 
 		Info = map[string]interface{}{
-			"username":  session.Values["username"],
-			"password":  session.Values["password"],
-			"isLogged":  session.Values["isLogin"],
-			"pageTitle": "Verdict",
+			"Username":  session.Values["username"],
+			"Password":  session.Values["password"],
+			"IsLogged":  session.Values["isLogin"],
+			"PageTitle": "Verdict",
 			"Res":       res,
 		}
 

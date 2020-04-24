@@ -5,7 +5,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -63,14 +62,14 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 
 	DB := dbConn()
 
-	//checking for token period
-	var tPeriod int64
-	res := DB.QueryRow("SELECT tokenPeriod FROM user WHERE token=?", token).Scan(&tPeriod)
+	//checking for token sent time
+	var tokenSent int64
+	res := DB.QueryRow("SELECT tokenSent FROM user WHERE token=?", token).Scan(&tokenSent)
 
 	if res == sql.ErrNoRows {
 		//token not found
 		lastPage = "tokenInvalid"
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else { //found a row
 		//checking for already verified or not
 		var isVerified int
@@ -78,23 +77,22 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 		if isVerified == 1 {
 			//already verified
 			lastPage = "tokenAlreadyVerified"
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else if isVerified == 0 {
 			//checking for token expired or not
-			nowPeriod := time.Now().Unix()
-			diff := nowPeriod - tPeriod
+			tokenReceived := time.Now().Unix()
+			diff := tokenReceived - tokenSent
 
 			if diff > (2 * 60 * 60) { //2 hours period
 				lastPage = "tokenExpired"
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				http.Redirect(w, r, "/", http.StatusSeeOther)
 			} else {
-				verifiedTime := strconv.FormatInt(nowPeriod, 10)
-				updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenPeriod=? WHERE token=?")
+				updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenSent=? WHERE token=?")
 				checkErr(err)
-				updateQuery.Exec(verifiedTime,token)
+				updateQuery.Exec(tokenReceived, token) //after verified tokenSent indicates the verified time
 
 				lastPage = "tokenVerifiedNow"
-				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				http.Redirect(w, r, "/", http.StatusSeeOther)
 			}
 		}
 	}

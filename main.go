@@ -23,15 +23,17 @@ func main() {
 	r.HandleFunc("/login", backEnd.Login)
 	r.HandleFunc("/loginCheck", backEnd.LoginCheck)
 	r.HandleFunc("/logout", backEnd.Logout)
-	r.HandleFunc("/resetPassword", backEnd.ResetPassword)
 
 	r.HandleFunc("/register", backEnd.Register)
 	r.HandleFunc("/doRegister", backEnd.DoRegister)
 
 	r.PathPrefix("/check").HandlerFunc(backEnd.CheckDB)
 	r.PathPrefix("/verify-email").HandlerFunc(backEnd.EmailVerifiation)
-	r.HandleFunc("/tokenRequest", backEnd.TokenRequest)
-	r.HandleFunc("/sendToken", backEnd.SendToken)
+	
+	r.PathPrefix("/reset").HandlerFunc(backEnd.Reset)
+	r.PathPrefix("/DoReset").HandlerFunc(backEnd.DoReset)
+	r.PathPrefix("/passReset").HandlerFunc(backEnd.PassReset)
+	r.HandleFunc("/doPassReset", backEnd.DoPassReset)
 
 	r.HandleFunc("/problem", backEnd.Problem)
 	r.PathPrefix("/problemView").HandlerFunc(backEnd.ProblemView)
@@ -49,7 +51,7 @@ func main() {
 	r.HandleFunc("/testSub", backEnd.TestSub)
 
 	//for serving javascripts & css files
-	r.PathPrefix("/assests/").Handler(http.StripPrefix("/assests/", http.FileServer(http.Dir("assests"))))
+	r.PathPrefix("/assets/").Handler(http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 
 	//A Custom Page Not Found route
 	r.NotFoundHandler = http.HandlerFunc(backEnd.PageNotFound)

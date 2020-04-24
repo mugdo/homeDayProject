@@ -1,0 +1,68 @@
+{{ template "head" . }}
+
+<div id="content">
+    <form id="registrationForm" action="/doPassReset" method="POST">
+        <h1>Reset Password</h1>
+        <div class="form-group">
+            <input type="hidden" id="token" name="token" class="form-control" value="{{ .Token }}" required>
+        </div>
+        <div class="form-group">
+            <label for="password">New Password :</label>
+            <input type="password" id="password" name="password" class="form-control" value="" required>
+        </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password :</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" value="" required><br>
+            <span style="color: red;" id="errPassword"></span>
+        </div>
+        <div class="form-group">
+            <input type="reset" name="reset" value="Reset">
+            <input type="submit" name="register" value="Request" id="submit">
+        </div>
+    </form>
+    <script>
+        console.log("Script linked properly")
+
+        var password = $('#password')
+        var confirmPassword = $('#confirmPassword')
+        var errPassword = $('#errPassword')
+
+        password.keyup( function() {
+            var pass = password.val()
+            var confirmPass = confirmPassword.val()
+
+            if(confirmPass.length > 0 || (confirmPass.length == 0 && errPassword.text() != "")){
+                if(pass!==confirmPass){
+                    errPassword.text("Password mismatched. Put cautiously")
+                } else {
+                    errPassword.text("")
+                }
+            }
+        });
+        confirmPassword.keyup( function() {
+            var pass = password.val()
+            var confirmPass = confirmPassword.val()
+            
+            if(pass!==confirmPass){
+                errPassword.text("Password mismatched. Put cautiously")
+            } else {
+                errPassword.text("")
+            }
+        });
+
+        $('.form-group').keyup(function() {
+            var checkSubmit = setInterval(function() {
+                if(errPassword.text() === ""){
+                    $('#submit').removeAttr('disabled');
+                    $('#submit').removeAttr('Title');
+                } else {
+                    $('#submit').attr('disabled', 'disabled');
+                    $('#submit').attr('Title', 'Please fix the error.');
+                }           
+                clearInterval(checkSubmit)
+            }, 100);  
+        });
+    </script>
+</div>
+
+{{ template "close" . }}

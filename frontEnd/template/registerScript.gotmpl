@@ -40,6 +40,18 @@
         });
     });
 
+    password.keyup( function() {
+        var pass = password.val()
+        var confirmPass = confirmPassword.val()
+        
+        if(confirmPass.length > 0 || (confirmPass.length == 0 && errPassword.text() != "")){
+            if(pass!==confirmPass){
+                errPassword.text("Password mismatched. Put cautiously")
+            } else {
+                errPassword.text("")
+            }
+        }
+    });
     confirmPassword.keyup( function() {
         var pass = password.val()
         var confirmPass = confirmPassword.val()

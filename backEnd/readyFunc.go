@@ -1,10 +1,15 @@
 package backEnd
 
 import (
+	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"net/http"
+	"net/smtp"
 	"net/url"
 	"strconv"
 	"strings"
@@ -288,4 +293,30 @@ func getLanguage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	b, _ := json.Marshal(languagePack)
 	w.Write(b)
+}
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+func sendMail(email, link string) {
+	// Choose auth method and set it up
+	auth := smtp.PlainAuth("", "ajudge.bd", "aj199273", "smtp.gmail.com")
+
+	// Here we do it all: connect to our server, set up a message and send it
+	to := []string{email}
+	msg := []byte("To: " + email + "\r\n" +
+		"Subject: Ajudge Email verification\r\n" +
+		"\r\n" +
+		"Here’s the link of account activation. Click on the:\r\n" +
+		link)
+	err := smtp.SendMail("smtp.gmail.com:587", auth, "ajudge Team", to, msg)
+	checkErr(err)
+}
+func generateToken() string {
+	b := make([]byte, 16)
+	rand.Read(b)
+
+	hasher := md5.New()
+	hasher.Write(b)
+	return hex.EncodeToString(hasher.Sum(nil))
 }

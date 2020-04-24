@@ -1,4 +1,5 @@
-{{ define "popUpLoginScript" }}
+{{ define "popUpScript" }}
+
 <div id="popUp">
     {{ if eq .LastPage "RegistrationDone" }}
     <div class="popup-wrap">
@@ -13,7 +14,7 @@
     <div class="popup-wrap">
         <div class="popup-box">
             <h2>Invalid Token</h2>
-            <h3><a href="/tokenRequest">Request</a> for a new Token</h3>
+            <h3><a href="/resetToken">Request</a> for a new Token</h3>
             <a class="close-btn popup-close" href="#">x</a>
         </div>
     </div>
@@ -29,7 +30,7 @@
     <div class="popup-wrap">
         <div class="popup-box">
             <h2>Token Expired</h2>
-            <h3><a href="/tokenRequest">Request</a> for a new Token</h3>
+            <h3><a href="/resetToken">Request</a> for a new Token</h3>
             <a class="close-btn popup-close" href="#">x</a>
         </div>
     </div>
@@ -47,6 +48,39 @@
             <h2>New Token Sent</h2>
             <h3>A verification link was sent to your provided email. Go to the link for email verification.</h3>
             <h3>The link will expire in 2 hours.</h3>
+            <a class="close-btn popup-close" href="#">x</a>
+        </div>
+    </div>
+    {{ else if eq .LastPage "passwordRequest"}}
+    <div class="popup-wrap">
+        <div class="popup-box">
+            <h2>Password Reset Link Sent</h2>
+            <h3>A password reset link was sent to your provided email. Go to the link for password reset.</h3>
+            <h3>The link will expire in 2 hours.</h3>
+            <a class="close-btn popup-close" href="#">x</a>
+        </div>
+    </div>
+    {{ else if eq .LastPage "passTokenInvalid"}}
+    <div class="popup-wrap">
+        <div class="popup-box">
+            <h2>Token Invalid</h2>
+            <h3><a href="/resetPassword">Get</a> a new token for resetting your password.</h3>
+            <a class="close-btn popup-close" href="#">x</a>
+        </div>
+    </div>
+    {{ else if eq .LastPage "passTokenExpired"}}
+    <div class="popup-wrap">
+        <div class="popup-box">
+            <h2>Token Expired</h2>
+            <h3><a href="/resetPassword">Get</a> a new token for resetting your password.</h3>
+            <a class="close-btn popup-close" href="#">x</a>
+        </div>
+    </div>
+    {{ else if eq .LastPage "passwordReset"}}
+    <div class="popup-wrap">
+        <div class="popup-box">
+            <h2>Password Reset Successfully</h2>
+            <h3>Login to your account now using your new password.</h3>
             <a class="close-btn popup-close" href="#">x</a>
         </div>
     </div>

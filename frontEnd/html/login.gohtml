@@ -5,17 +5,17 @@
         <form class="loginForm" action="/loginCheck" method="POST">
             <h1>LOGIN</h1>
             <div class="form-group">
-                <input type="text" id="username" name="username" class="form-control" value="{{.username}}" placeholder="Username" required>
+                <input type="text" id="username" name="username" class="form-control" value="{{ .Username }}" placeholder="Username" required>
                 <span style="color: red;"  id="errUsername" name="errUsername"></span>
             </div>
             <div class="form-group">
                 <input type="password" name="password" class="form-control" placeholder="Password" required>
-                <span style="color: red;">{{.errPassword}}</span>
+                <span style="color: red;">{{ .ErrPassword }}</span>
             </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-primary" value="Login" name="" id="submit">
             </div>
-            <span><a href="/reset">Forgot Password?</a></span>
+            <span><a href="/resetPassword">Forgot Password?</a></span>
         </form>
     </div>
 </div>

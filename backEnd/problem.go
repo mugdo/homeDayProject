@@ -33,15 +33,15 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Info = map[string]interface{}{
-		"username":  session.Values["username"],
-		"password":  session.Values["password"],
-		"isLogged":  session.Values["isLogin"],
+		"Username":  session.Values["username"],
+		"Password":  session.Values["password"],
+		"IsLogged":  session.Values["isLogin"],
 		"PList":     pList,
 		"Found":     found,
 		"OJ":        OJ,
 		"PNum":      pNum,
 		"PName":     pName,
-		"pageTitle": "Problem",
+		"PageTitle": "Problem",
 	}
 
 	tpl.ExecuteTemplate(w, "problem.gohtml", Info)
@@ -132,10 +132,10 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := store.Get(r, "mysession")
 	Info = map[string]interface{}{
-		"username":    session.Values["username"],
-		"password":    session.Values["password"],
-		"isLogged":    session.Values["isLogin"],
-		"pageTitle":   pTitle,
+		"Username":    session.Values["username"],
+		"Password":    session.Values["password"],
+		"IsLogged":    session.Values["isLogin"],
+		"PageTitle":   pTitle,
 		"OJ":          OJ,
 		"PNum":        pNum,
 		"AllowSubmit": allowSubmit,

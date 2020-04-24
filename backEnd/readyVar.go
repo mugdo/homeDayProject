@@ -1,11 +1,10 @@
 package backEnd
 
 import (
+	"github.com/gorilla/sessions"
 	"html/template"
 	"net/http"
 	"net/http/cookiejar"
-
-	"github.com/gorilla/sessions"
 )
 
 var tpl *template.Template

@@ -14,19 +14,19 @@
             {{ template "footer" . }}
         </div>
         <script src="../assets/scripts/main.js"></script>
-        {{ if eq .pageTitle "Verdict" }}
+        {{ if eq .PageTitle "Verdict" }}
             {{ template "verdictScript" . }}
-        {{ else if eq .pageTitle "Submission" }}
+        {{ else if eq .PageTitle "Submission" }}
             {{ template "submissionScript" . }}
-        {{ else if eq .pageTitle "Registration" }}
+        {{ else if eq .PageTitle "Registration" }}
             {{ template "registerScript" . }}
-        {{ else if and (eq .pageTitle "Login") (or (eq .LastPage "RegistrationDone") (eq .LastPage "tokenInvalid") (eq .LastPage "tokenAlreadyVerified") (eq .LastPage "tokenExpired") (eq .LastPage "tokenVerifiedNow") (eq .LastPage "tokenRequest")) }}
-            {{ template "popUpLoginScript" . }}
+        {{ else if and (eq .PageTitle "Login") (eq .LastPage "RegistrationDone") }}
+            {{ template "popUpScript" . }}
             {{ template "loginScript" . }}
-        {{ else if eq .pageTitle "Login" }}
+        {{ else if eq .PageTitle "Login" }}
             {{ template "loginScript" . }}
-        {{ else if and (eq .pageTitle "Homepage") (or (eq .LastPage "RegistrationDone") (eq .LastPage "tokenInvalid") (eq .LastPage "tokenAlreadyVerified") (eq .LastPage "tokenExpired") (eq .LastPage "tokenVerifiedNow") (eq .LastPage "tokenRequest")) }}
-            {{ template "popUpLoginScript" . }}
+        {{ else if and (eq .PageTitle "Homepage") (or (eq .LastPage "tokenInvalid") (eq .LastPage "tokenAlreadyVerified") (eq .LastPage "tokenExpired") (eq .LastPage "tokenVerifiedNow") (eq .LastPage "tokenRequest") (eq .LastPage "passwordRequest") (eq .LastPage "passTokenInvalid") (eq .LastPage "passTokenExpired") (eq .LastPage "passwordReset") ) }}
+            {{ template "popUpScript" . }}
         {{ end }}
     </body>
 </html>

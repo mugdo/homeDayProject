@@ -1,7 +1,6 @@
 package backEnd
 
 import (
-	"database/sql"
 	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"strings"
@@ -16,11 +15,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
 		Info = map[string]interface{}{
-			"pageTitle": "Login",
+			"PageTitle": "Login",
 			"LastPage":  lastPage,
 		}
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
-
 		lastPage = "login"
 	}
 }
@@ -42,40 +40,31 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 	DB := dbConn()
 
 	Info = map[string]interface{}{
-		"username": username,
+		"Username": username,
 	}
 
-	//checking for username really exist or not
+	//getting original password
 	var originalPassword string
-	err := DB.QueryRow("SELECT password FROM user WHERE username=?", username).Scan(&originalPassword)
+	_ = DB.QueryRow("SELECT password FROM user WHERE username=?", username).Scan(&originalPassword)
 
-	if err == sql.ErrNoRows {
-		//username not found (found no rows)
-		Info["errUsername"] = "No Account found with this username. Try again"
-		Info["username"] = ""
+	if checkPasswordHash(password, originalPassword) { //if password matched
+		session, _ := store.Get(r, "mysession")
+		session.Values["username"] = username
+		session.Values["password"] = password
+		session.Values["isLogin"] = true
+		session.Save(r, w)
+
+		Info = map[string]interface{}{
+			"Username": session.Values["username"],
+			"Password": session.Values["password"],
+			"IsLogged": session.Values["isLogin"],
+		}
+
+		http.Redirect(w, r, "/redirect", http.StatusSeeOther)
+	} else { //if password not matched
+		Info["ErrPassword"] = "Invalid password"
 
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
-	} else {
-		//no error on db.QueryRow (username found & original password achieved)
-		if checkPasswordHash(password, originalPassword) {
-			session, _ := store.Get(r, "mysession")
-			session.Values["username"] = username
-			session.Values["password"] = password
-			session.Values["isLogin"] = true
-			session.Save(r, w)
-
-			Info = map[string]interface{}{
-				"username": session.Values["username"],
-				"password": session.Values["password"],
-				"isLogged": session.Values["isLogin"],
-			}
-
-			http.Redirect(w, r, "/redirect", http.StatusSeeOther)
-		} else {
-			Info["errPassword"] = "Invalid password"
-
-			tpl.ExecuteTemplate(w, "login.gohtml", Info)
-		}
 	}
 
 	defer DB.Close()

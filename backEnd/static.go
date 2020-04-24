@@ -6,8 +6,16 @@ import (
 
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	
-	if lastPage != "tokenInvalid" && lastPage != "tokenAlreadyVerified" && lastPage != "tokenExpired" && lastPage != "tokenVerifiedNow" {
+
+	if lastPage != "tokenInvalid" &&
+		lastPage != "tokenAlreadyVerified" &&
+		lastPage != "tokenExpired" &&
+		lastPage != "tokenVerifiedNow" &&
+		lastPage != "tokenRequest" &&
+		lastPage != "passwordRequest" &&
+		lastPage != "passTokenInvalid" &&
+		lastPage != "passTokenExpired" &&
+		lastPage != "passwordReset" {
 		lastPage = "index"
 	}
 
@@ -17,11 +25,11 @@ func Index(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Info = map[string]interface{}{
-		"username":  session.Values["username"],
-		"password":  session.Values["password"],
-		"isLogged":  session.Values["isLogin"],
+		"Username":  session.Values["username"],
+		"Password":  session.Values["password"],
+		"IsLogged":  session.Values["isLogin"],
 		"LastPage":  lastPage,
-		"pageTitle": "Homepage",
+		"PageTitle": "Homepage",
 	}
 
 	tpl.ExecuteTemplate(w, "index.gohtml", Info)
@@ -39,10 +47,10 @@ func About(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Info = map[string]interface{}{
-		"username":  session.Values["username"],
-		"password":  session.Values["password"],
-		"isLogged":  session.Values["isLogin"],
-		"pageTitle": "About",
+		"Username":  session.Values["username"],
+		"Password":  session.Values["password"],
+		"IsLogged":  session.Values["isLogin"],
+		"PageTitle": "About",
 	}
 
 	tpl.ExecuteTemplate(w, "about.gohtml", Info)
@@ -58,10 +66,10 @@ func Contact(w http.ResponseWriter, r *http.Request) {
 	}
 
 	Info = map[string]interface{}{
-		"username":  session.Values["username"],
-		"password":  session.Values["password"],
-		"isLogged":  session.Values["isLogin"],
-		"pageTitle": "Contact",
+		"Username":  session.Values["username"],
+		"Password":  session.Values["password"],
+		"IsLogged":  session.Values["isLogin"],
+		"PageTitle": "Contact",
 	}
 
 	tpl.ExecuteTemplate(w, "contact.gohtml", Info)
@@ -86,7 +94,7 @@ func PageNotFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	Info = map[string]interface{}{
-		"pageTitle": "Page Not Found",
+		"PageTitle": "Page Not Found",
 	}
 	tpl.ExecuteTemplate(w, "404.gohtml", Info)
 }
