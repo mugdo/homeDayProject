@@ -2,13 +2,11 @@ package backEnd
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 func Problem(w http.ResponseWriter, r *http.Request) {
