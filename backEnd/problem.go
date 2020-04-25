@@ -2,11 +2,13 @@ package backEnd
 
 import (
 	"encoding/json"
-	"github.com/PuerkitoBio/goquery"
+	"fmt"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func Problem(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +69,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		pNum = string(runes[index+1:])
 	}
 
-	//Finding problem Title, Time limit, Memory limit, Description source
+	//Finding problem Title, Time limit, Memory limit, Description source(pDesSrc)
 	findPResource(OJ, pNum)
 
 	//for uva & uvalive pdf description
