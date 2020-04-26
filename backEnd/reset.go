@@ -35,7 +35,7 @@ func Reset(w http.ResponseWriter, r *http.Request) { //calling from two diff pag
 		action = "/DoResetT"
 		resetCommon(w, r, title, action)
 	} else {
-		page404(w)
+		PageNotFound(w, r)
 	}
 }
 func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 1.Pass reset or 2.Token reset

@@ -1,7 +1,6 @@
 package backEnd
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -92,25 +91,8 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 }
 
 func PageNotFound(w http.ResponseWriter, r *http.Request) {
-	page404(w)
-}
-func page404(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 	w.WriteHeader(http.StatusNotFound) //http.StatusNotFound = 404
 
-	fmt.Fprintln(w, `<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<title>Page Not Found</title>
-			<meta charset="UTF-8">
-			<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		</head>
-		<body>
-			<div id="content">
-				<h1 style="color: red; text-align: center; font-size: 164px;">404</h1>
-				<h1 style="color: brown; text-align: center; margin-top: -135px;">Page Not Found</h1>
-				<a href="/" style="color: blue; margin-left: 610px;">Return to Homepage</a>
-			</div>
-		</body>
-	</html>`)
+	tpl.ExecuteTemplate(w, "404.gohtml", nil)
 }
