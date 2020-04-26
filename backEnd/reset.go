@@ -8,24 +8,8 @@ import (
 	"time"
 )
 
-func Reset(w http.ResponseWriter, r *http.Request) { //calling from two diff pages. 1.Request token 2.Forgot password
-	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-
-	path := r.URL.Path
-	match, err := regexp.Match("Password", []byte(path))
-	checkErr(err)
-
-	var action, title string
-	if match == true {
-		title = "Reset Password"
-		action = "/DoResetP"
-	} else {
-		title = "New Token Request"
-		action = "/DoResetT"
-	}
-
+func resetCommon(w http.ResponseWriter, r *http.Request, title, action string) {
 	session, _ := store.Get(r, "mysession")
-
 	Info = map[string]interface{}{
 		"Username":  session.Values["username"],
 		"Password":  session.Values["password"],
@@ -35,6 +19,24 @@ func Reset(w http.ResponseWriter, r *http.Request) { //calling from two diff pag
 		"Action":    action,
 	}
 	tpl.ExecuteTemplate(w, "reset.gohtml", Info)
+}
+func Reset(w http.ResponseWriter, r *http.Request) { //calling from two diff pages. 1.Request token 2.Forgot password
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+
+	path := r.URL.Path
+
+	var action, title string
+	if path == "/resetPassword" {
+		title = "Reset Password"
+		action = "/DoResetP"
+		resetCommon(w, r, title, action)
+	} else if path == "/resetToken" {
+		title = "New Token Request"
+		action = "/DoResetT"
+		resetCommon(w, r, title, action)
+	} else {
+		page404(w)
+	}
 }
 func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 1.Pass reset or 2.Token reset
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
