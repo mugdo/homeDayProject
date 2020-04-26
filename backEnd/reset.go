@@ -3,7 +3,6 @@ package backEnd
 import (
 	"database/sql"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 )
@@ -35,7 +34,7 @@ func Reset(w http.ResponseWriter, r *http.Request) { //calling from two diff pag
 		action = "/DoResetT"
 		resetCommon(w, r, title, action)
 	} else {
-		PageNotFound(w, r)
+		errorPage(w, http.StatusNotFound)
 	}
 }
 func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 1.Pass reset or 2.Token reset
@@ -47,20 +46,16 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 	}
 
 	path := r.URL.Path
-	match, err := regexp.Match("P", []byte(path))
-	checkErr(err)
-
 	email := strings.TrimSpace(r.FormValue("email"))
 	DB := dbConn()
 	token := generateToken()
 	tokenSent := time.Now().Unix()
 
-	if match == true { //Request for Password reset
-		//cheching for email already exist or not in the resetpassword table
+	if path == "/DoResetP" { //Request for Password reset
+		//cheching for email already exist or not in the resetpassword table in DB
 		var ID int
 		res := DB.QueryRow("SELECT id FROM resetpassword WHERE email=?", email).Scan(&ID)
-		if res == sql.ErrNoRows {
-			//Row not found
+		if res == sql.ErrNoRows { //Row not found
 			//Inserting in Reset Table
 			insertQuery, err := DB.Prepare("INSERT INTO resetpassword (email,token,tokenSent) VALUES(?,?,?)")
 			checkErr(err)
@@ -71,17 +66,16 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 			checkErr(err)
 			updateQuery.Exec(token, tokenSent, email)
 		}
-		link := "http://localhost:8080/passReset=" + token
+		link := "http://localhost:8080/passReset=" + token //sending link to mail
 		sendMail(email, link)
 
 		lastPage = "passwordRequest"
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else { //Request for Token reset
+	} else if path == "/DoResetT"{ //Request for Token reset
 		//updating DB with new token
 		insertQuery, err := DB.Prepare("UPDATE user SET token=?,tokenSent=? WHERE email=?")
 		checkErr(err)
 		insertQuery.Exec(token, tokenSent, email)
-		println("Token Updated")
 
 		link := "http://localhost:8080/verify-email/token=" + token
 		sendMail(email, link)

@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>{{ .PageTitle }}</title>
+        <title>Error</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body>
         <div id="content">
-            <h1 style="color: red; text-align: center; font-size: 164px;">404</h1>
-            <h1 style="color: brown; text-align: center; margin-top: -135px;">Page Not Found</h1>
-            <a href="/" style="color: blue; margin-left: 610px;">Return to Homepage</a>
+            <div id="pageNotFound">
+                <h1 style="color: red; text-align: center; font-size: 164px;">{{ .StatusCode }}</h1>
+
+                {{ if eq .StatusCode 400 }}
+                <h1 style="color: brown; text-align: center; margin-top: -135px;">Bad Request</h1>
+                {{ else if eq .StatusCode 404 }}
+                <h1 style="color: brown; text-align: center; margin-top: -135px;">Page Not Found</h1>
+                {{ end }}
+
+                <p style="color: blue; text-align: center;"><a href="/">Return to Homepage</a></p>
+            </div>
         </div>
     </body>
 </html>

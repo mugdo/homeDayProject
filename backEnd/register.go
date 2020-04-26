@@ -62,44 +62,47 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 
 	need := "="
 	index := strings.Index(path, need)
-	token := string(runes[index+1:])
 
-	DB := dbConn()
+	if index == -1 {
+		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
+	} else { //url is "/verify-email/token=" something like this
+		token := string(runes[index+1:])
+		DB := dbConn()
 
-	//checking for token sent time
-	var tokenSent int64
-	res := DB.QueryRow("SELECT tokenSent FROM user WHERE token=?", token).Scan(&tokenSent)
+		//checking for token sent time
+		var tokenSent int64
+		res := DB.QueryRow("SELECT tokenSent FROM user WHERE token=?", token).Scan(&tokenSent)
 
-	if res == sql.ErrNoRows {
-		//token not found
-		lastPage = "tokenInvalid"
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else { //found a row
-		//checking for already verified or not
-		var isVerified int
-		_ = DB.QueryRow("SELECT isVerified FROM user WHERE token=?", token).Scan(&isVerified)
-		if isVerified == 1 {
-			//already verified
-			lastPage = "tokenAlreadyVerified"
+		if res == sql.ErrNoRows {
+			//token not found
+			lastPage = "tokenInvalid"
 			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else if isVerified == 0 {
-			//checking for token expired or not
-			tokenReceived := time.Now().Unix()
-			diff := tokenReceived - tokenSent
-
-			if diff > (2 * 60 * 60) { //2 hours period
-				lastPage = "tokenExpired"
+		} else { //found a row
+			//checking for already verified or not
+			var isVerified int
+			_ = DB.QueryRow("SELECT isVerified FROM user WHERE token=?", token).Scan(&isVerified)
+			if isVerified == 1 {
+				//already verified
+				lastPage = "tokenAlreadyVerified"
 				http.Redirect(w, r, "/", http.StatusSeeOther)
-			} else {
-				updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenSent=? WHERE token=?")
-				checkErr(err)
-				updateQuery.Exec(tokenReceived, token) //after verified tokenSent indicates the verified time
+			} else if isVerified == 0 {
+				//checking for token expired or not
+				tokenReceived := time.Now().Unix()
+				diff := tokenReceived - tokenSent
 
-				lastPage = "tokenVerifiedNow"
-				http.Redirect(w, r, "/", http.StatusSeeOther)
+				if diff > (2 * 60 * 60) { //2 hours period
+					lastPage = "tokenExpired"
+					http.Redirect(w, r, "/", http.StatusSeeOther)
+				} else {
+					updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenSent=? WHERE token=?")
+					checkErr(err)
+					updateQuery.Exec(tokenReceived, token) //after verified tokenSent indicates the verified time
+
+					lastPage = "tokenVerifiedNow"
+					http.Redirect(w, r, "/", http.StatusSeeOther)
+				}
 			}
 		}
+		defer DB.Close()
 	}
-
-	defer DB.Close()
 }

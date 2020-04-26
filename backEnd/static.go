@@ -92,7 +92,13 @@ func Redirect(w http.ResponseWriter, r *http.Request) {
 
 func PageNotFound(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	w.WriteHeader(http.StatusNotFound) //http.StatusNotFound = 404
+	errorPage(w,http.StatusNotFound)
+}
+func errorPage(w http.ResponseWriter,statusCode int){
+	w.WriteHeader(statusCode) //http.StatusNotFound = 404 // 
 
-	tpl.ExecuteTemplate(w, "404.gohtml", nil)
+	Info = map[string]interface{}{
+		"StatusCode": statusCode,
+	}
+	tpl.ExecuteTemplate(w, "404.gohtml", Info)
 }

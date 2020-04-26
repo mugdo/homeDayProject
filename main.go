@@ -28,10 +28,10 @@ func main() {
 	r.HandleFunc("/doRegister", backEnd.DoRegister)
 
 	r.PathPrefix("/check").HandlerFunc(backEnd.CheckDB)
-	r.PathPrefix("/verify-email").HandlerFunc(backEnd.EmailVerifiation)
+	r.PathPrefix("/verify-email/").HandlerFunc(backEnd.EmailVerifiation)
 	
 	r.PathPrefix("/reset").HandlerFunc(backEnd.Reset)
-	r.PathPrefix("/DoReset").HandlerFunc(backEnd.DoReset)
+	r.PathPrefix("/doReset").HandlerFunc(backEnd.DoReset)
 	r.PathPrefix("/passReset").HandlerFunc(backEnd.PassReset)
 	r.HandleFunc("/doPassReset", backEnd.DoPassReset)
 
