@@ -32,7 +32,7 @@ func main() {
 	
 	r.PathPrefix("/reset").HandlerFunc(backEnd.Reset)
 	r.PathPrefix("/doReset").HandlerFunc(backEnd.DoReset)
-	r.PathPrefix("/passReset").HandlerFunc(backEnd.PassReset)
+	r.PathPrefix("/passReset/").HandlerFunc(backEnd.PassReset)
 	r.HandleFunc("/doPassReset", backEnd.DoPassReset)
 
 	r.HandleFunc("/problem", backEnd.Problem)

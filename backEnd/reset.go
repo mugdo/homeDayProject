@@ -66,12 +66,12 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 			checkErr(err)
 			updateQuery.Exec(token, tokenSent, email)
 		}
-		link := "http://localhost:8080/passReset=" + token //sending link to mail
+		link := "http://localhost:8080/passReset/token=" + token //sending link to mail
 		sendMail(email, link)
 
 		lastPage = "passwordRequest"
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else if path == "/DoResetT"{ //Request for Token reset
+	} else if path == "/DoResetT" { //Request for Token reset
 		//updating DB with new token
 		insertQuery, err := DB.Prepare("UPDATE user SET token=?,tokenSent=? WHERE email=?")
 		checkErr(err)
@@ -91,44 +91,47 @@ func PassReset(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 	runes := []rune(path)
 
-	need := "="
+	need := "token="
 	index := strings.Index(path, need)
-	token := string(runes[index+1:])
 
-	DB := dbConn()
+	if index == -1 {
+		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
+	} else { //url is "/passReset/token=" something like this
+		token := string(runes[index+6:]) //index+0 = t, on 'token='
+		DB := dbConn()
 
-	var email string
-	res := DB.QueryRow("SELECT email FROM resetpassword WHERE token=?", token).Scan(&email)
-	if res == sql.ErrNoRows {
-		//Row not found
-		lastPage = "passTokenInvalid"
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else { //found a row
-		//checking for token expired or not
-		var tokenSent int64
-		_ = DB.QueryRow("SELECT tokenSent FROM resetpassword WHERE token=?", token).Scan(&tokenSent)
-		tokenReceived := time.Now().Unix() //current time
-		diff := tokenReceived - tokenSent
-
-		if diff > (2 * 60 * 60) { //2 hours period
-			lastPage = "passTokenExpired"
+		var email string
+		res := DB.QueryRow("SELECT email FROM resetpassword WHERE token=?", token).Scan(&email)
+		if res == sql.ErrNoRows { //Row not found
+			lastPage = "passTokenInvalid"
 			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else {
+		} else { //found a row
+			//checking for token expired or not
+			var tokenSent int64
+			_ = DB.QueryRow("SELECT tokenSent FROM resetpassword WHERE token=?", token).Scan(&tokenSent)
+			tokenReceived := time.Now().Unix() //current time
+			diff := tokenReceived - tokenSent
 
-			session, _ := store.Get(r, "mysession")
+			if diff > (2 * 60 * 60) { //2 hours period
+				lastPage = "passTokenExpired"
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+			} else {
 
-			Info = map[string]interface{}{
-				"Username":  session.Values["username"],
-				"Password":  session.Values["password"],
-				"IsLogged":  session.Values["isLogin"],
-				"LastPage":  lastPage,
-				"PageTitle": "Reset Password",
-				"Token":     token,
+				session, _ := store.Get(r, "mysession")
+
+				Info = map[string]interface{}{
+					"Username":  session.Values["username"],
+					"Password":  session.Values["password"],
+					"IsLogged":  session.Values["isLogin"],
+					"LastPage":  lastPage,
+					"PageTitle": "Reset Password",
+					"Token":     token,
+				}
+				tpl.ExecuteTemplate(w, "passReset.gohtml", Info)
 			}
-			tpl.ExecuteTemplate(w, "passReset.gohtml", Info)
 		}
+		defer DB.Close()
 	}
-	defer DB.Close()
 }
 func DoPassReset(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")

@@ -57,16 +57,18 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	defer DB.Close()
 }
 func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+	
 	path := r.URL.Path
 	runes := []rune(path)
 
-	need := "="
+	need := "token="
 	index := strings.Index(path, need)
 
 	if index == -1 {
 		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 	} else { //url is "/verify-email/token=" something like this
-		token := string(runes[index+1:])
+		token := string(runes[index+6:]) //index+0 = t, on 'token='
 		DB := dbConn()
 
 		//checking for token sent time

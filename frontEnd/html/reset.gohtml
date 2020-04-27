@@ -20,17 +20,21 @@
         var errEmail = $('#errEmail')
 
         email.keyup( function() {
-            $.ajax({
-                url: "/check/email="+email.val().trim(),
-                method: "GET",
-                success: function(data) {
-                    if(data=="true"){
-                        errEmail.text("")
-                    } else {
-                        errEmail.text("No account found with this email. Enter correct one.")
-                    }
-                },
-            });
+            if (email.val().length==0) {
+                errEmail.text("")
+            } else {
+                $.ajax({
+                    url: "/check/email="+email.val().trim(),
+                    method: "GET",
+                    success: function(data) {
+                        if(data=="true"){
+                            errEmail.text("")
+                        } else {
+                            errEmail.text("No account found with this email. Enter correct one.")
+                        }
+                    },
+                });
+            }
         });
 
         $('.form-group').keyup(function() {
