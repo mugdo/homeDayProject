@@ -21,7 +21,7 @@ var client = &http.Client{
 var store = sessions.NewCookieStore([]byte("mysession"))
 var Info = map[string]interface{}{}
 
-var lastPage = ""
+var lastPage = "/"
 var pTitle, pTimeLimit, pMemoryLimit, pDesSrc = "-", "-", "-", "-"
 
 type Inner struct {

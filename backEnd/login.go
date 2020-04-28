@@ -19,7 +19,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			"LastPage":  lastPage,
 		}
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
-		lastPage = "login"
+
+		if lastPage == "registrationDone" {
+			lastPage = "login"
+		}
 	}
 }
 func checkPasswordHash(password, hash string) bool {
@@ -59,8 +62,7 @@ func LoginCheck(w http.ResponseWriter, r *http.Request) {
 			"Password": session.Values["password"],
 			"IsLogged": session.Values["isLogin"],
 		}
-
-		http.Redirect(w, r, "/redirect", http.StatusSeeOther)
+		http.Redirect(w, r, lastPage, http.StatusSeeOther)
 	} else { //if password not matched
 		Info["ErrPassword"] = "Invalid password"
 

@@ -51,21 +51,21 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	link := "http://localhost:8080/verify-email/token=" + token
 	sendMail(email, link)
 
-	lastPage = "RegistrationDone"
+	lastPage = "registrationDone"
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 
 	defer DB.Close()
 }
 func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	
+
 	path := r.URL.Path
 	runes := []rune(path)
 
 	need := "token="
 	index := strings.Index(path, need)
 
-	if index == -1 {
+	if index == -1 { //url is not like this "/verify-email/token="
 		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 	} else { //url is "/verify-email/token=" something like this
 		token := string(runes[index+6:]) //index+0 = t, on 'token='

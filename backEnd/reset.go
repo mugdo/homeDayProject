@@ -94,7 +94,7 @@ func PassReset(w http.ResponseWriter, r *http.Request) {
 	need := "token="
 	index := strings.Index(path, need)
 
-	if index == -1 {
+	if index == -1 { //url is not like this "/passReset/token="
 		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 	} else { //url is "/passReset/token=" something like this
 		token := string(runes[index+6:]) //index+0 = t, on 'token='

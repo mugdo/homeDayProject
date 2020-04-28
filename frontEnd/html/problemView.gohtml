@@ -1,11 +1,18 @@
 {{ template "head" . }}
 
 <div id="content">
-    <h1>Hello this is problem page</h1>
     <div id="upperContent">
         <h3>{{ .PName }}</h3>
+        {{ if eq .MemoryLimit "-" }}
+        <p>Memory Limit : Not Found</p>
+        {{ else }}
         <p>Memory Limit : {{ .MemoryLimit }}</p>
+        {{ end }}
+        {{ if eq .TimeLimit "-" }}
+        <p>Time Limit   : Not Found</p>
+        {{ else }}
         <p>Time Limit   : {{ .TimeLimit }}</p>
+        {{ end }}
 
         {{ if eq .AllowSubmit true }}
             {{ $link := (printf "/submission/%s-%s" .OJ .PNum) }}

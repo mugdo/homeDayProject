@@ -1,13 +1,7 @@
 {{ template "head" . }}
 
 <div id="content">
-    <h1>Hello this is Submission page</h1>
-    <div id="upperContent">
-        <h3>{{ .PName }}</h3>
-        <p>Memory Limit : {{ .MemoryLimit }}</p>
-        <p>Time Limit   : {{ .TimeLimit }}</p>
-    </div>
-    <div id="lowerContent">
+    <div id="submission">
         <form id="submit-form" action="/submit" method="POST">
             <div class="form-group">
                 <label >Problem:</label>
