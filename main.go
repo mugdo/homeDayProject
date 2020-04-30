@@ -36,6 +36,7 @@ func main() {
 
 	r.HandleFunc("/problem", backEnd.Problem)
 	r.PathPrefix("/problemView/").HandlerFunc(backEnd.ProblemView)
+	r.PathPrefix("/origin/").HandlerFunc(backEnd.Origin)
 
 	r.HandleFunc("/submit", backEnd.Submit)
 	r.PathPrefix("/submission").HandlerFunc(backEnd.Submission)

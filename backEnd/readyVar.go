@@ -19,10 +19,22 @@ var client = &http.Client{
 }
 
 var store = sessions.NewCookieStore([]byte("mysession"))
+
+var OJSet = map[string]bool{
+	"AtCoder": true,
+	"CodeChef": true,
+	"CodeForces": true,
+	"Gym": true,
+	"HackerRank": true,
+	"LightOJ": true,
+	"TopCoder": true,
+	"UVA": true,
+}
+
 var Info = map[string]interface{}{}
 
 var lastPage = "/"
-var pTitle, pTimeLimit, pMemoryLimit, pDesSrc = "-", "-", "-", "-"
+var pTitle, pTimeLimit, pMemoryLimit, pDesSrc, pOrigin = "-", "-", "-", "-", "-"
 
 type Inner struct {
 	OriginOJ    string `json:"originOJ"`

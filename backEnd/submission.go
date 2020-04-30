@@ -44,7 +44,6 @@ func Submission(w http.ResponseWriter, r *http.Request) {
 
 	lastPage = "submission"
 	session, _ := store.Get(r, "mysession")
-
 	if r.URL.Path == "/submission" {
 		Info = map[string]interface{}{
 			"Username":    session.Values["username"],
