@@ -51,4 +51,21 @@ func CheckDB(w http.ResponseWriter, r *http.Request) {
 	}
 	defer DB.Close()
 }
+func isAccVerifed(r *http.Request) bool {
+	session, _ := store.Get(r, "mysession")
+	username := session.Values["username"]
 
+	DB := dbConn()
+	defer DB.Close()
+
+	var res bool
+	var isVerified int
+	_ = DB.QueryRow("SELECT isVerified FROM user WHERE username=?", username).Scan(&isVerified)
+	if isVerified == 1 {
+		res = true
+	} else if isVerified == 0 {
+		res = false
+	}
+
+	return res
+}

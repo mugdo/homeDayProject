@@ -51,7 +51,7 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	link := "http://localhost:8080/verify-email/token=" + token
 	sendMail(email, link)
 
-	lastPage = "registrationDone"
+	popUpCause = "registrationDone"
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 
 	defer DB.Close()
@@ -77,7 +77,7 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 
 		if res == sql.ErrNoRows {
 			//token not found
-			lastPage = "tokenInvalid"
+			popUpCause = "tokenInvalid"
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else { //found a row
 			//checking for already verified or not
@@ -85,7 +85,7 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 			_ = DB.QueryRow("SELECT isVerified FROM user WHERE token=?", token).Scan(&isVerified)
 			if isVerified == 1 {
 				//already verified
-				lastPage = "tokenAlreadyVerified"
+				popUpCause = "tokenAlreadyVerified"
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 			} else if isVerified == 0 {
 				//checking for token expired or not
@@ -93,14 +93,14 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 				diff := tokenReceived - tokenSent
 
 				if diff > (2 * 60 * 60) { //2 hours period
-					lastPage = "tokenExpired"
+					popUpCause = "tokenExpired"
 					http.Redirect(w, r, "/", http.StatusSeeOther)
 				} else {
 					updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenSent=? WHERE token=?")
 					checkErr(err)
 					updateQuery.Exec(tokenReceived, token) //after verified tokenSent indicates the verified time
 
-					lastPage = "tokenVerifiedNow"
+					popUpCause = "tokenVerifiedNow"
 					http.Redirect(w, r, "/", http.StatusSeeOther)
 				}
 			}

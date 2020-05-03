@@ -69,7 +69,7 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 		link := "http://localhost:8080/passReset/token=" + token //sending link to mail
 		sendMail(email, link)
 
-		lastPage = "passwordRequest"
+		popUpCause = "passwordRequest"
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else if path == "/DoResetT" { //Request for Token reset
 		//updating DB with new token
@@ -80,7 +80,7 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 		link := "http://localhost:8080/verify-email/token=" + token
 		sendMail(email, link)
 
-		lastPage = "tokenRequest"
+		popUpCause = "tokenRequest"
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 	defer DB.Close()
@@ -103,7 +103,7 @@ func PassReset(w http.ResponseWriter, r *http.Request) {
 		var email string
 		res := DB.QueryRow("SELECT email FROM resetpassword WHERE token=?", token).Scan(&email)
 		if res == sql.ErrNoRows { //Row not found
-			lastPage = "passTokenInvalid"
+			popUpCause = "passTokenInvalid"
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		} else { //found a row
 			//checking for token expired or not
@@ -113,7 +113,7 @@ func PassReset(w http.ResponseWriter, r *http.Request) {
 			diff := tokenReceived - tokenSent
 
 			if diff > (2 * 60 * 60) { //2 hours period
-				lastPage = "passTokenExpired"
+				popUpCause = "passTokenExpired"
 				http.Redirect(w, r, "/", http.StatusSeeOther)
 			} else {
 
@@ -155,7 +155,7 @@ func DoPassReset(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 	query.Exec(password, email)
 
-	lastPage = "passwordReset"
+	popUpCause = "passwordReset"
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 
 	defer DB.Close()

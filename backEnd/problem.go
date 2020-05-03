@@ -85,7 +85,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		OJ = string(runes[0:index])
 		pNum = string(runes[index+1:])
 
-		if OJ == "" || pNum == "" { //bad url, not OJ & pNum specified
+		if OJSet[OJ] == false || pNum == "" { //bad url, not OJ & pNum specified
 			errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 		} else { // got something in OJ and pNum
 			//Finding problem Title, Time limit, Memory limit, Description source(pDesSrc)
@@ -195,7 +195,7 @@ func Origin(w http.ResponseWriter, r *http.Request) {
 		OJ = string(runes[0:index])
 		pNum = string(runes[index+1:])
 
-		if OJ == "" || pNum == "" { //bad url, not OJ & pNum specified
+		if OJSet[OJ] == false || pNum == "" { //bad url, not OJ & pNum specified
 			errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 		} else { // got something in OJ and pNum
 			//Finding origin

@@ -7,34 +7,23 @@ import (
 func Index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
-	if lastPage != "tokenInvalid" &&
-		lastPage != "tokenAlreadyVerified" &&
-		lastPage != "tokenExpired" &&
-		lastPage != "tokenVerifiedNow" &&
-		lastPage != "tokenRequest" &&
-		lastPage != "passwordRequest" &&
-		lastPage != "passTokenInvalid" &&
-		lastPage != "passTokenExpired" &&
-		lastPage != "passwordReset" {
-		lastPage = "/"
-	}
-
 	session, _ := store.Get(r, "mysession")
 	Info = map[string]interface{}{
-		"Username":  session.Values["username"],
-		"Password":  session.Values["password"],
-		"IsLogged":  session.Values["isLogin"],
-		"LastPage":  lastPage,
-		"PageTitle": "Homepage",
+		"Username":   session.Values["username"],
+		"Password":   session.Values["password"],
+		"IsLogged":   session.Values["isLogin"],
+		"LastPage":   lastPage,
+		"PopUpCause": popUpCause,
+		"PageTitle":  "Homepage",
 	}
 
 	tpl.ExecuteTemplate(w, "index.gohtml", Info)
-	lastPage = "/"
+	popUpCause = ""
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	
+
 	lastPage = "about"
 	session, _ := store.Get(r, "mysession")
 	Info = map[string]interface{}{

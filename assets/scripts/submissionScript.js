@@ -38,7 +38,7 @@ function addLanguage(OJ) {
     });
 };
 
-addSelected(OJReal);
+addSelected(OJReal); //adding selected tag
 addLanguage(OJReal);
 
 OJBox.on('change', function () {

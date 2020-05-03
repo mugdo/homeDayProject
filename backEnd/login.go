@@ -15,14 +15,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	} else {
 		Info = map[string]interface{}{
-			"PageTitle": "Login",
-			"LastPage":  lastPage,
+			"PageTitle":  "Login",
+			"LastPage":   lastPage,
+			"PopUpCause": popUpCause,
 		}
 		tpl.ExecuteTemplate(w, "login.gohtml", Info)
-
-		if lastPage == "registrationDone" {
-			lastPage = "login"
-		}
+		popUpCause = ""
 	}
 }
 func checkPasswordHash(password, hash string) bool {
