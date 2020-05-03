@@ -27,11 +27,11 @@ func Reset(w http.ResponseWriter, r *http.Request) { //calling from two diff pag
 	var action, title string
 	if path == "/resetPassword" {
 		title = "Reset Password"
-		action = "/DoResetP"
+		action = "/doResetP"
 		resetCommon(w, r, title, action)
 	} else if path == "/resetToken" {
 		title = "New Token Request"
-		action = "/DoResetT"
+		action = "/doResetT"
 		resetCommon(w, r, title, action)
 	} else {
 		errorPage(w, http.StatusNotFound)
@@ -51,7 +51,7 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 	token := generateToken()
 	tokenSent := time.Now().Unix()
 
-	if path == "/DoResetP" { //Request for Password reset
+	if path == "/doResetP" { //Request for Password reset
 		//cheching for email already exist or not in the resetpassword table in DB
 		var ID int
 		res := DB.QueryRow("SELECT id FROM resetpassword WHERE email=?", email).Scan(&ID)
@@ -71,7 +71,7 @@ func DoReset(w http.ResponseWriter, r *http.Request) { //calling from submit of 
 
 		popUpCause = "passwordRequest"
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	} else if path == "/DoResetT" { //Request for Token reset
+	} else if path == "/doResetT" { //Request for Token reset
 		//updating DB with new token
 		insertQuery, err := DB.Prepare("UPDATE user SET token=?,tokenSent=? WHERE email=?")
 		checkErr(err)

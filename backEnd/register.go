@@ -46,7 +46,6 @@ func DoRegister(w http.ResponseWriter, r *http.Request) {
 	insertQuery, err := DB.Prepare("INSERT INTO user(fullName, email, username, password, createdAt, isVerified, token, tokenSent) VALUES(?,?,?,?,?,?,?,?)")
 	checkErr(err)
 	insertQuery.Exec(fullName, email, username, password, CurrentTime, 0, token, tokenSent)
-	println("Registration Done")
 
 	link := "http://localhost:8080/verify-email/token=" + token
 	sendMail(email, link)

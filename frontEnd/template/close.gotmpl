@@ -16,19 +16,15 @@
         <script src="../assets/scripts/main.js"></script>
         {{ if eq .PageTitle "Verdict" }}
             <script src="../assets/scripts/verdictScript.js"></script>
-        {{ else if and (eq .PageTitle "Submission") (eq .PopUpCause "submissionError") }}
-            {{ template "popUpScript" . }}
-            <script src="../assets/scripts/submissionScript.js"></script>
         {{ else if eq .PageTitle "Submission" }}
             <script src="../assets/scripts/submissionScript.js"></script>
         {{ else if eq .PageTitle "Registration" }}
             <script src="../assets/scripts/registerScript.js"></script>
-        {{ else if and (eq .PageTitle "Login") (or (eq .PopUpCause "registrationDone") (eq .PopUpCause "loginRequired") ) }}
-            {{ template "popUpScript" . }}
-            <script src="../assets/scripts/loginScript.js"></script>
         {{ else if eq .PageTitle "Login" }}
             <script src="../assets/scripts/loginScript.js"></script>
-        {{ else if and (eq .PageTitle "Homepage") (or (eq .PopUpCause "tokenInvalid") (eq .PopUpCause "tokenAlreadyVerified") (eq .PopUpCause "tokenExpired") (eq .PopUpCause "tokenVerifiedNow") (eq .PopUpCause "tokenRequest") (eq .PopUpCause "passwordRequest") (eq .PopUpCause "passTokenInvalid") (eq .PopUpCause "passTokenExpired") (eq .PopUpCause "passwordReset") (eq .PopUpCause "verifyRequired") ) }}
+        {{ end }}
+
+        {{ if or (eq .PopUpCause "registrationDone") (eq .PopUpCause "tokenInvalid") (eq .PopUpCause "tokenAlreadyVerified") (eq .PopUpCause "tokenExpired") (eq .PopUpCause "tokenVerifiedNow") (eq .PopUpCause "tokenRequest") (eq .PopUpCause "passwordRequest") (eq .PopUpCause "passTokenInvalid") (eq .PopUpCause "passTokenExpired") (eq .PopUpCause "passwordReset") (eq .PopUpCause "verifyRequired") }}
             {{ template "popUpScript" . }}
         {{ end }}
     </body>
