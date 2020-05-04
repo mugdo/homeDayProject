@@ -2,15 +2,15 @@
 
 <div id="content">
     <div id="login">
-        <form class="loginForm" action="/loginCheck" method="POST">
+        <form class="loginForm" method="POST">
             <h1>LOGIN</h1>
             <div class="form-group">
                 <input type="text" id="username" name="username" class="form-control" value="{{ .Username }}" placeholder="Username" required>
-                <span style="color: red;"  id="errUsername" name="errUsername"></span>
+                <span style="color: red;" id="errUsername"></span>
             </div>
             <div class="form-group">
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
-                <span style="color: red;">{{ .ErrPassword }}</span>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
+                <span style="color: red;" id="errPassword">{{ .ErrPassword }}</span>
             </div>
             <div class="form-group">
                 <input type="submit" class="btn btn-primary" value="Login" name="" id="submit">

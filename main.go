@@ -20,7 +20,6 @@ func main() {
 	r.HandleFunc("/contact", backEnd.Contact)
 
 	r.HandleFunc("/login", backEnd.Login)
-	r.HandleFunc("/loginCheck", backEnd.LoginCheck)
 	r.HandleFunc("/logout", backEnd.Logout)
 
 	r.HandleFunc("/register", backEnd.Register)
