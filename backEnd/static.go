@@ -52,7 +52,7 @@ func PageNotFound(w http.ResponseWriter, r *http.Request) {
 	errorPage(w, http.StatusNotFound)
 }
 func errorPage(w http.ResponseWriter, statusCode int) {
-	w.WriteHeader(statusCode) //http.StatusNotFound = 404 //
+	w.WriteHeader(statusCode) //status code such as: 400, 404 etc.
 
 	Info["StatusCode"] = statusCode
 
