@@ -2,6 +2,7 @@ package backEnd
 
 import (
 	"golang.org/x/crypto/bcrypt"
+	"html"
 	"net/http"
 	"strings"
 )
@@ -24,10 +25,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 			tpl.ExecuteTemplate(w, "login.gohtml", Info)
 			popUpCause = ""
+			Info["PopUpCause"] = popUpCause
 		}
-	} else {
-		username := strings.TrimSpace(r.FormValue("username"))
-		password := strings.TrimSpace(r.FormValue("password"))
+	} else if r.Method == "POST" {
+		username := html.EscapeString(strings.TrimSpace(r.FormValue("username")))
+		password := html.EscapeString(r.FormValue("password"))
 
 		DB := dbConn()
 		defer DB.Close()

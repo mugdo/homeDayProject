@@ -19,6 +19,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	tpl.ExecuteTemplate(w, "index.gohtml", Info)
 	popUpCause = ""
+	Info["PopUpCause"]=popUpCause
 }
 
 func About(w http.ResponseWriter, r *http.Request) {

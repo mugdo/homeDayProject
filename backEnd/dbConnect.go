@@ -36,20 +36,19 @@ func CheckDB(w http.ResponseWriter, r *http.Request) {
 	}
 
 	DB := dbConn()
+	defer DB.Close()
 
 	//checking for username/email already exist or not
 	temp := ""
 	res := DB.QueryRow("SELECT id FROM user WHERE "+colName+"=?", colValue).Scan(&temp)
-	//checkErr(err)
-	if res == sql.ErrNoRows {
-		//username/email available (found no rows)
+
+	if res == sql.ErrNoRows { //found no rows (username/email available)
 		b := []byte("false")
 		w.Write(b)
 	} else { //found a row
 		b := []byte("true")
 		w.Write(b)
 	}
-	defer DB.Close()
 }
 func isAccVerifed(r *http.Request) bool {
 	session, _ := store.Get(r, "mysession")

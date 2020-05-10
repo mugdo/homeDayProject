@@ -23,15 +23,12 @@ func main() {
 	r.HandleFunc("/logout", backEnd.Logout)
 
 	r.HandleFunc("/register", backEnd.Register)
-	r.HandleFunc("/doRegister", backEnd.DoRegister)
 
 	r.PathPrefix("/check").HandlerFunc(backEnd.CheckDB)
 	r.PathPrefix("/verify-email/").HandlerFunc(backEnd.EmailVerifiation)
-	
+
 	r.PathPrefix("/reset").HandlerFunc(backEnd.Reset)
-	r.PathPrefix("/doReset").HandlerFunc(backEnd.DoReset)
 	r.PathPrefix("/passReset/").HandlerFunc(backEnd.PassReset)
-	r.HandleFunc("/doPassReset", backEnd.DoPassReset)
 
 	r.HandleFunc("/problem", backEnd.Problem)
 	r.PathPrefix("/problemView/").HandlerFunc(backEnd.ProblemView)
