@@ -17,32 +17,33 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	pName := r.FormValue("pName")
 
 	var pListNew []Inner
-	var s = 0
+	var start = 0
 	var length = "20"
 
 	//taking 20 problem
 	for i := 0; i < 999999; i++ {
-		body, err := pSearch(OJ, pNum, pName, strconv.Itoa(s), length)
+		body, err := pSearch(OJ, pNum, pName, strconv.Itoa(start), length)
 		checkErr(err)
 
 		pList := getPList(body)
 
 		if len(pList.Data) == 0 { //if no problem list found
 			break
-		} else { //got 20 problem
+		} else { //getting problem one by one
 			for j := 0; j < len(pList.Data); j++ {
 				if OJSet[pList.Data[j].OriginOJ] { //if problem come from desired OJ
 					pListNew = append(pListNew, pList.Data[j])
 				}
-				if len(pListNew) >= 20 {
+				if len(pListNew) >= 20 { //got 20 problem
 					break
 				}
 			}
 		}
-		if len(pListNew) >= 20 {
+		if len(pListNew) >= 20 { //checking again, got 20 problem
 			break
 		}
-		s++
+		len, _ := strconv.Atoi(length)
+		start = start + len
 	}
 
 	found := true
@@ -52,17 +53,16 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 
 	lastPage = "problem"
 	session, _ := store.Get(r, "mysession")
-	Info = map[string]interface{}{
-		"Username":  session.Values["username"],
-		"Password":  session.Values["password"],
-		"IsLogged":  session.Values["isLogin"],
-		"PList":     pListNew,
-		"Found":     found,
-		"OJ":        OJ,
-		"PNum":      pNum,
-		"PName":     pName,
-		"PageTitle": "Problem",
-	}
+
+	Info["Username"] = session.Values["username"]
+	Info["Password"] = session.Values["password"]
+	Info["IsLogged"] = session.Values["isLogin"]
+	Info["PList"] = pListNew
+	Info["Found"] = found
+	Info["OJ"] = OJ
+	Info["PNum"] = pNum
+	Info["PName"] = pName
+	Info["PageTitle"] = "Problem"
 
 	tpl.ExecuteTemplate(w, "problem.gohtml", Info)
 }
@@ -91,19 +91,10 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 			//Finding problem Title, Time limit, Memory limit, Description source(pDesSrc)
 			findPResource(OJ, pNum)
 
-			//for uva & uvalive pdf description
-			var uvaSegment string
-			if OJ == "UVA" || OJ == "UVALive" {
-				temp, _ := strconv.Atoi(pNum)
-
-				IntSegment := temp / 100
-				uvaSegment = strconv.Itoa(IntSegment)
-			}
-
 			if pDesSrc == "" { //didn't get any problem
 				errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 			} else { //got a problem and resources
-				// getting problem description///////////////
+				// getting problem description
 				pURL := "https://vjudge.net" + pDesSrc //value of pDesSrc came from findPResource(OJ, pNum) function
 				req, err := http.NewRequest("GET", pURL, nil)
 				req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
@@ -154,22 +145,30 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 					allowSubmit = true
 				}
 
+				//for uva pdf description
+				var uvaSegment string
+				if OJ == "UVA" {
+					temp, _ := strconv.Atoi(pNum)
+
+					IntSegment := temp / 100
+					uvaSegment = strconv.Itoa(IntSegment)
+				}
+
 				lastPage = r.URL.Path
 				session, _ := store.Get(r, "mysession")
-				Info = map[string]interface{}{
-					"Username":    session.Values["username"],
-					"Password":    session.Values["password"],
-					"IsLogged":    session.Values["isLogin"],
-					"PageTitle":   pTitle,
-					"OJ":          OJ,
-					"PNum":        pNum,
-					"AllowSubmit": allowSubmit,
-					"UvaSegment":  uvaSegment,
-					"PName":       pTitle,
-					"TimeLimit":   pTimeLimit,
-					"MemoryLimit": pMemoryLimit,
-					"Problem":     problem,
-				}
+
+				Info["Username"] = session.Values["username"]
+				Info["Password"] = session.Values["password"]
+				Info["IsLogged"] = session.Values["isLogin"]
+				Info["PageTitle"] = pTitle
+				Info["OJ"] = OJ
+				Info["PNum"] = pNum
+				Info["AllowSubmit"] = allowSubmit
+				Info["UvaSegment"] = uvaSegment
+				Info["PName"] = pTitle
+				Info["TimeLimit"] = pTimeLimit
+				Info["MemoryLimit"] = pMemoryLimit
+				Info["Problem"] = problem
 
 				tpl.ExecuteTemplate(w, "problemView.gohtml", Info)
 			}
@@ -187,7 +186,7 @@ func Origin(w http.ResponseWriter, r *http.Request) {
 	index := strings.Index(OJpNum, need)
 	OJ, pNum := "", ""
 
-	if index == -1 { //url is not like this "/peoblemview/OJ-pNum"
+	if index == -1 { //url is not like this "/origin/OJ-pNum"
 		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 	} else {
 		runes = []rune(OJpNum)
@@ -217,8 +216,7 @@ func Origin(w http.ResponseWriter, r *http.Request) {
 				//getting origin link
 				pOrigin = getOriginLink("https://vjudge.net" + pOrigin)
 
-				lastPage = r.URL.Path
-				http.Redirect(w,r,pOrigin,http.StatusSeeOther)
+				http.Redirect(w, r, pOrigin, http.StatusSeeOther)
 			}
 		}
 	}

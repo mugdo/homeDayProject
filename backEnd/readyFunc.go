@@ -488,7 +488,7 @@ func generateToken() string {
 func getOriginLink(apiURL string) string {
 	req, _ := http.NewRequest("GET", apiURL, nil)
 
-	//prevent auto rederict
+	//setting up requset to prevent auto rederict
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse

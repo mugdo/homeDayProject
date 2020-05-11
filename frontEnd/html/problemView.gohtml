@@ -4,12 +4,12 @@
     <div id="upperContent">
         <h3>{{ .PName }}</h3>
         {{ if eq .MemoryLimit "-" }}
-        <p>Memory Limit : Not Found</p>
+        <p>Memory Limit : Not Specified</p>
         {{ else }}
         <p>Memory Limit : {{ .MemoryLimit }}</p>
         {{ end }}
         {{ if eq .TimeLimit "-" }}
-        <p>Time Limit   : Not Found</p>
+        <p>Time Limit   : Not Specified</p>
         {{ else }}
         <p>Time Limit   : {{ .TimeLimit }}</p>
         {{ end }}
@@ -29,9 +29,9 @@
             {{ if eq .OJ "UVA" }}
                 {{ $link := (printf "https://onlinejudge.org/external/%s/p%s.pdf" .UvaSegment .PNum) }}
                 <center><iframe src="{{ $link }}" width= "70%" height= "1000px" frameborder= "0"></iframe></center>
-            {{ else if eq .OJ "UVALive" }}
+            {{/* {{ else if eq .OJ "UVALive" }}
                 {{ $link := (printf "https://icpcarchive.ecs.baylor.edu/external/%s/p%s.pdf" .UvaSegment .PNum) }}
-                <center><iframe src="{{ $link }} " width= "70%" height= "1000px" frameborder= "0"></iframe></center>
+                <center><iframe src="{{ $link }} " width= "70%" height= "1000px" frameborder= "0"></iframe></center> */}}
             {{ else }}
                 {{ range $i := .Problem }}
                     <h3>{{ .Title }}</h3>
