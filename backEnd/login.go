@@ -24,6 +24,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			Info["PopUpCause"] = popUpCause
 
 			tpl.ExecuteTemplate(w, "login.gohtml", Info)
+			Info["Username"] = ""
+			Info["ErrPassword"] = ""
 			popUpCause = ""
 			Info["PopUpCause"] = popUpCause
 		}

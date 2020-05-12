@@ -2,15 +2,15 @@ var url = document.getElementById("url").innerText
 console.log(url)
 
 $(document).ready(function () {
+    var counter = 0;
     var doCheck = setInterval(function () {
-        var counter = 0;
         $.getJSON(url, function (result) {
             $('#res').text(result.status);
             counter++;
-            console.log(counter)
-            if (counter > 15 || result.status == "Accepted" || result.status == "Worng Answer") {
+            if (counter > 15 || result.status == "Accepted" || result.status == "Wrong Answer" || result.status == "Compilation Error" || result.status == "Time Limit Exceeded") {
+                console.log(counter+result.status)
                 clearInterval(doCheck);
             }
         });
-    }, 2000);  //Delay here = .5 seconds
+    }, 2000);  //Delay here = 2 seconds
 });

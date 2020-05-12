@@ -24,7 +24,11 @@
             <script src="../assets/scripts/loginScript.js"></script>
         {{ end }}
 
-        {{ if or ( and (eq .PageTitle "Login") (eq .PopUpCause "registrationDone") ) (and (eq .PageTitle "Homepage") (or (eq .PopUpCause "tokenInvalid") (eq .PopUpCause "tokenAlreadyVerified") (eq .PopUpCause "tokenExpired") (eq .PopUpCause "tokenVerifiedNow") (eq .PopUpCause "tokenRequest") (eq .PopUpCause "passwordRequest") (eq .PopUpCause "passTokenInvalid") (eq .PopUpCause "passTokenExpired") (eq .PopUpCause "passwordReset") (eq .PopUpCause "verifyRequired") ) )}}
+        {{ if and (eq .PageTitle "Login") (eq .PopUpCause "registrationDone") }}
+            {{ template "popUpScript" . }}
+        {{ else if and (eq .PageTitle "Homepage") (or (eq .PopUpCause "tokenInvalid") (eq .PopUpCause "tokenAlreadyVerified") (eq .PopUpCause "tokenExpired") (eq .PopUpCause "tokenVerifiedNow") (eq .PopUpCause "tokenRequest") (eq .PopUpCause "passwordRequest") (eq .PopUpCause "passTokenInvalid") (eq .PopUpCause "passTokenExpired") (eq .PopUpCause "passwordReset") (eq .PopUpCause "verifyRequired") ) }}
+            {{ template "popUpScript" . }}
+        {{ else if and (eq .PageTitle "Submission") (eq .PopUpCause "submissionError") }}
             {{ template "popUpScript" . }}
         {{ end }}
     </body>

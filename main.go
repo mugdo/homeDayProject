@@ -34,8 +34,7 @@ func main() {
 	r.PathPrefix("/problemView/").HandlerFunc(backEnd.ProblemView)
 	r.PathPrefix("/origin/").HandlerFunc(backEnd.Origin)
 
-	r.HandleFunc("/submit", backEnd.Submit)
-	r.PathPrefix("/submission").HandlerFunc(backEnd.Submission)
+	r.PathPrefix("/submit").HandlerFunc(backEnd.Submit)
 	r.PathPrefix("/lang").HandlerFunc(backEnd.GetLanguage)
 	r.HandleFunc("/verdict", backEnd.Verdict)
 
