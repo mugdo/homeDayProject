@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -231,10 +230,22 @@ func Verdict(w http.ResponseWriter, r *http.Request) {
 	defer DB.Close()
 
 	//checking for submission status from DB
-	var verdict, timeExec, memoryExec, submitTime, vID string
+	var verdict, timeExec, memoryExec, vID string
+	var submitTime int64
 	_ = DB.QueryRow("SELECT verdict,timeExec,memoryExec,submitTime,vID FROM submission WHERE id=?", subID).Scan(&verdict, &timeExec, &memoryExec, &submitTime, &vID)
 
-	if verdict != "Accepted" || verdict != "Wrong Answer" || verdict != "Compilation Error" || verdict != "Time Limit Exceeded" || verdict != "Memory Limit Exceeded" { //data not exist. go for api call
+	if verdict == "Accepted" || verdict == "Wrong Answer" || verdict == "Compilation Error" || verdict == "Time Limit Exceeded" || verdict == "Memory Limit Exceeded" { //already data exist
+		mapD := map[string]interface{}{
+			"status":     verdict,
+			"runtime":    timeExec,
+			"memory":     memoryExec,
+			"submitTime": time.Unix(submitTime, 0),
+		}
+		mapB, _ := json.Marshal(mapD)
+
+		b := []byte(mapB)
+		w.Write(b)
+	} else { //data not exist. go for api call
 		apiURL := "https://vjudge.net/solution/data/" + vID
 		body, _ := rGET(apiURL)
 
@@ -250,24 +261,11 @@ func Verdict(w http.ResponseWriter, r *http.Request) {
 		checkErr(err)
 		updateQuery.Exec(res.Status, res.Runtime, res.Memory, subID)
 
-		tempTime, _ := strconv.ParseInt(submitTime, 10, 64)
-
 		mapD := map[string]interface{}{
 			"status":     res.Status,
 			"runtime":    res.Runtime,
 			"memory":     res.Memory,
-			"submitTime": time.Unix(tempTime, 0),
-		}
-		mapB, _ := json.Marshal(mapD)
-
-		b := []byte(mapB)
-		w.Write(b)
-	} else { //already data exist
-		mapD := map[string]interface{}{
-			"status":     verdict,
-			"runtime":    timeExec,
-			"memory":     memoryExec,
-			"submitTime": submitTime,
+			"submitTime": time.Unix(submitTime, 0),
 		}
 		mapB, _ := json.Marshal(mapD)
 

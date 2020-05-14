@@ -4,32 +4,31 @@
     <h2>Submission Result</h2>
 
     <p style="display: none;" id="subID" style="color: blueviolet;">{{ .SubID }}</p>
-    <p id="res">Submitting</p>
 
-    <table>
-        <th>
-            <td>Submission ID</td>
-            <td>OJ</td>
-            <td>Problem Number</td>
-            <td>Verdict</td>
-            <td>Time (ms)</td>
-            <td>Memory (kb)</td>
-            <td>Language</td>
-            <td>Submit Time</td>
-        </th>
-        <tr>
-            <td>{{ .SubID }}</td>
-            <td>{{ .OJ }}</td>
-            {{ $link := (printf "/problemView/%s-%s" .OJ .PNum) }}
-            <td><a href="{{ $link }}">{{ .PNum }}</a></td>
-            <td id="verdict"></td>
-            <td id="time"></td>
-            <td id="memory"></td>
-            <td>{{ .Language }}</td>
-            <td id="submitTime"></td>
+    <table style="border: 1px solid black;border-collapse: collapse;">
+        <tr style="border: 1px solid black;border-collapse: collapse;">
+            <th style="border: 1px solid black;border-collapse: collapse;">Submission ID</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">OJ</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">Problem Number</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">Verdict</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">Time (ms)</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">Memory (kb)</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">Language</th>
+            <th style="border: 1px solid black;border-collapse: collapse;">Submit Time</th>
         </tr>
-        <tr>
-            <td>{{ .SourceCode }}</td>
+        <tr style="border: 1px solid black;border-collapse: collapse;">
+            <td style="border: 1px solid black;border-collapse: collapse;">{{ .SubID }}</td>
+            <td style="border: 1px solid black;border-collapse: collapse;">{{ .OJ }}</td>
+            {{ $link := (printf "/problemView/%s-%s" .OJ .PNum) }}
+            <td style="border: 1px solid black;border-collapse: collapse;"><a href="{{ $link }}">{{ .PNum }}</a></td>
+            <td style="border: 1px solid black;border-collapse: collapse;" id="verdict">Submitting</td>
+            <td style="border: 1px solid black;border-collapse: collapse;" id="time"></td>
+            <td style="border: 1px solid black;border-collapse: collapse;" id="memory"></td>
+            <td style="border: 1px solid black;border-collapse: collapse;">{{ .Language }}</td>
+            <td style="border: 1px solid black;border-collapse: collapse;" id="submitTime"></td>
+        </tr>
+        <tr style="border: 1px solid black;border-collapse: collapse;">
+            <td style="border: 1px solid black;border-collapse: collapse;" colspan="8"><pre>{{ .SourceCode }}</pre></td>
         </tr>
     </table>
 </div>

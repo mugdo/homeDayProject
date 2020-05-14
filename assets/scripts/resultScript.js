@@ -11,12 +11,11 @@ $(document).ready(function () {
     var counter = 0;
     var doCheck = setInterval(function () {
         $.getJSON(url, function (result) {
-            $('#res').text(result.status);
             counter++;
             if (result.status == "Accepted" || result.status == "Wrong Answer" || result.status == "Compilation Error" || result.status == "Time Limit Exceeded" || result.status == "Memory Limit Exceeded") {
                 
                 verdict.text(result.status)
-                time.text(result.runTime)
+                time.text(result.runtime)
                 memory.text(result.memory)
                 submitTime.text(result.submitTime)
 
