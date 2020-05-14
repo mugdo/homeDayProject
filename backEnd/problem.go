@@ -81,7 +81,6 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 	} else {
 		runes = []rune(OJpNum)
-
 		OJ = string(runes[0:index])
 		pNum = string(runes[index+1:])
 

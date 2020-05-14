@@ -24,19 +24,21 @@ func main() {
 
 	r.HandleFunc("/register", backEnd.Register)
 
-	r.PathPrefix("/check").HandlerFunc(backEnd.CheckDB)
-	r.PathPrefix("/verify-email/").HandlerFunc(backEnd.EmailVerifiation)
+	r.PathPrefix("/check/").HandlerFunc(backEnd.CheckDB)
+	r.PathPrefix("/verify-email/token=").HandlerFunc(backEnd.EmailVerifiation)
 
 	r.PathPrefix("/reset").HandlerFunc(backEnd.Reset)
-	r.PathPrefix("/passReset/").HandlerFunc(backEnd.PassReset)
+	r.PathPrefix("/passReset/token=").HandlerFunc(backEnd.PassReset)
 
 	r.HandleFunc("/problem", backEnd.Problem)
 	r.PathPrefix("/problemView/").HandlerFunc(backEnd.ProblemView)
 	r.PathPrefix("/origin/").HandlerFunc(backEnd.Origin)
 
 	r.PathPrefix("/submit").HandlerFunc(backEnd.Submit)
-	r.PathPrefix("/lang").HandlerFunc(backEnd.GetLanguage)
-	r.HandleFunc("/verdict", backEnd.Verdict)
+	r.PathPrefix("/lang=").HandlerFunc(backEnd.GetLanguage)
+
+	r.HandleFunc("/result", backEnd.Result)
+	r.PathPrefix("/verdict/subID=").HandlerFunc(backEnd.Verdict)
 
 	// r.HandleFunc("/scrap", backEnd.Scrap)
 	// r.HandleFunc("/toph", backEnd.Toph)

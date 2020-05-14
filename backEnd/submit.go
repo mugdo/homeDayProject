@@ -1,12 +1,14 @@
 package backEnd
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func rLogin(username, password, apiURL string) ([]byte, error) {
@@ -82,7 +84,6 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 						http.Redirect(w, r, "/submit", http.StatusSeeOther)
 					} else { //url is something like this "/submit/OJ-pNum"
 						runes = []rune(OJpNum)
-
 						OJ = string(runes[0:index])
 						pNum = string(runes[index+1:])
 
@@ -151,43 +152,126 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			//submit the code
 			body, err := rSubmit(r)
 			checkErr(err)
-			//fmt.Println("body", string(body))
+
 			type result struct { //json reply gives either error or runID
 				RunID int64  `json:"runId"`
 				Error string `json:"error"`
-				SubID string
-				URL   string
 			}
 			var res result
 			json.Unmarshal(body, &res)
-			fmt.Println("1", res.Error, lastPage, Info["Res"])
 
 			if res.Error != "" {
-				//OJ := r.FormValue("OJ")
-				//pNum := r.FormValue("pNum")
-				//lastPage = "/submit/" + OJ + "-" + pNum
-				//fmt.Println("lastpage=",lastPage)
 				errorType = res.Error
 				popUpCause = "submissionError"
 				http.Redirect(w, r, lastPage, http.StatusSeeOther)
+			} else if res.RunID == 0 {
+				errorType = res.Error
+				popUpCause = "submissionErrorCustom"
+				http.Redirect(w, r, lastPage, http.StatusSeeOther)
 			} else {
-				submissionID := strconv.FormatInt(res.RunID, 10)
-				//sending submit id to frontend for getting the verdict with ajax call
-				res.URL = "https://vjudge.net/solution/data/"
-				res.SubID = submissionID
+				// inserting submission records to DB //
+				DB := dbConn()
+				defer DB.Close()
+
+				//checking in DB for vSubID already exist or not
+				var rows *sql.Rows
+				rows, _ = DB.Query("SELECT username FROM submission WHERE vID=?", res.RunID)
+				defer rows.Close()
+
+				var uniqueUser bool = true
+				var username string
+				for rows.Next() {
+					err = rows.Scan(&username)
+					checkErr(err)
+
+					if username == session.Values["username"] {
+						uniqueUser = false
+						break
+					}
+				}
+
+				var id int
+				if uniqueUser { //vSubID doesn't exist with this username
+					insertQuery, err := DB.Prepare("INSERT INTO submission (username,OJ,pNum,language,submitTime,vID,sourceCode) VALUES (?,?,?,?,?,?,?)")
+					checkErr(err)
+					insertQuery.Exec(session.Values["username"], r.FormValue("OJ"), r.FormValue("pNum"), r.FormValue("language"), time.Now().Unix(), res.RunID, r.FormValue("source"))
+				}
+				//taking submission id
+				_ = DB.QueryRow("SELECT id FROM submission WHERE username=? AND vID=?", session.Values["username"], res.RunID).Scan(&id)
 
 				Info["Username"] = session.Values["username"]
 				Info["Password"] = session.Values["password"]
 				Info["IsLogged"] = session.Values["isLogin"]
-				Info["PageTitle"] = "Verdict"
-				Info["Res"] = res
+				Info["PageTitle"] = "Result"
+				Info["SubID"] = id //sending submit id to frontend for getting the verdict with ajax call
+				Info["OJ"] = r.FormValue("OJ")
+				Info["PNum"] = r.FormValue("pNum")
+				Info["Language"] = r.FormValue("language")
+				Info["SourceCode"] = r.FormValue("source")
 
-				http.Redirect(w, r, "/verdict", http.StatusSeeOther)
+				http.Redirect(w, r, "/result", http.StatusSeeOther)
 			}
 		}
 	}
 }
+func Result(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
+	tpl.ExecuteTemplate(w, "result.gohtml", Info)
+}
 func Verdict(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
-	tpl.ExecuteTemplate(w, "verdict.gohtml", Info)
+
+	path := r.URL.Path
+	runes := []rune(path)
+	need := "="
+	index := strings.Index(path, need)
+	subID := string(runes[index+1:])
+
+	DB := dbConn()
+	defer DB.Close()
+
+	//checking for submission status from DB
+	var verdict, timeExec, memoryExec, submitTime, vID string
+	_ = DB.QueryRow("SELECT verdict,timeExec,memoryExec,submitTime,vID FROM submission WHERE id=?", subID).Scan(&verdict, &timeExec, &memoryExec, &submitTime, &vID)
+
+	if verdict != "Accepted" || verdict != "Wrong Answer" || verdict != "Compilation Error" || verdict != "Time Limit Exceeded" || verdict != "Memory Limit Exceeded" { //data not exist. go for api call
+		apiURL := "https://vjudge.net/solution/data/" + vID
+		body, _ := rGET(apiURL)
+
+		type Res struct {
+			Status  string `json:"status"`
+			Runtime int    `json:"runtime"`
+			Memory  int    `json:"memory"`
+		}
+		var res Res
+		json.Unmarshal(body, &res)
+
+		updateQuery, err := DB.Prepare("UPDATE submission SET verdict=?,timeExec=?,memoryExec=? WHERE id=?")
+		checkErr(err)
+		updateQuery.Exec(res.Status, res.Runtime, res.Memory, subID)
+
+		tempTime, _ := strconv.ParseInt(submitTime, 10, 64)
+
+		mapD := map[string]interface{}{
+			"status":     res.Status,
+			"runtime":    res.Runtime,
+			"memory":     res.Memory,
+			"submitTime": time.Unix(tempTime, 0),
+		}
+		mapB, _ := json.Marshal(mapD)
+
+		b := []byte(mapB)
+		w.Write(b)
+	} else { //already data exist
+		mapD := map[string]interface{}{
+			"status":     verdict,
+			"runtime":    timeExec,
+			"memory":     memoryExec,
+			"submitTime": submitTime,
+		}
+		mapB, _ := json.Marshal(mapD)
+
+		b := []byte(mapB)
+		w.Write(b)
+	}
 }

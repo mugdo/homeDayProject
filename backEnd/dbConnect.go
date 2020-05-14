@@ -21,26 +21,34 @@ func dbConn() (db *sql.DB) {
 }
 func CheckDB(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
+	
+	var colName string
+	matched, err := regexp.MatchString("/check/username=", path)
+	checkErr(err)
+	if matched {
+		colName = "username"
+	} else {
+		matched, err = regexp.MatchString("/check/email=", path)
+		checkErr(err)
+		if matched {
+		colName = "email"
+		} else {
+			errorPage(w, http.StatusNotFound) //http.StatusNotFound = 404
+			return
+		}
+	}
+
 	runes := []rune(path)
 	need := "="
 	index := strings.Index(path, need)
 	colValue := string(runes[index+1:]) //username or email value
 
-	var colName string
-	matched, err := regexp.MatchString("username", path)
-	checkErr(err)
-	if matched {
-		colName = "username"
-	} else {
-		colName = "email"
-	}
-
 	DB := dbConn()
 	defer DB.Close()
 
 	//checking for username/email already exist or not
-	temp := ""
-	res := DB.QueryRow("SELECT id FROM user WHERE "+colName+"=?", colValue).Scan(&temp)
+	id := 0
+	res := DB.QueryRow("SELECT id FROM user WHERE "+colName+"=?", colValue).Scan(&id)
 
 	if res == sql.ErrNoRows { //found no rows (username/email available)
 		b := []byte("false")

@@ -106,6 +106,14 @@
             <a class="close-btn popup-close" href="#">x</a>
         </div>
     </div>
+    {{ else if eq .PopUpCause "submissionErrorCustom" }}
+    <div class="popup-wrap">
+        <div class="popup-box">
+            <h3>Error: Something went wrong.</h3>
+            <h3>Please try again.</h3>
+            <a class="close-btn popup-close" href="#">x</a>
+        </div>
+    </div>
     {{ end }}
 </div>
 <script>

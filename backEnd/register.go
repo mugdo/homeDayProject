@@ -51,48 +51,43 @@ func EmailVerifiation(w http.ResponseWriter, r *http.Request) {
 
 	path := r.URL.Path
 	runes := []rune(path)
-
-	need := "token="
+	need := "="
 	index := strings.Index(path, need)
+	token := string(runes[index+1:])
+	
+	DB := dbConn()
+	defer DB.Close()
 
-	if index == -1 { //url is not like this "/verify-email/token="
-		errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
-	} else { //url is "/verify-email/token=" something like this
-		token := string(runes[index+6:]) //index+0 = t, on 'token='
-		DB := dbConn()
-		defer DB.Close()
+	//checking for token sent time
+	var tokenSent int64
+	res := DB.QueryRow("SELECT tokenSent FROM user WHERE token=?", token).Scan(&tokenSent)
 
-		//checking for token sent time
-		var tokenSent int64
-		res := DB.QueryRow("SELECT tokenSent FROM user WHERE token=?", token).Scan(&tokenSent)
+	if res == sql.ErrNoRows { //no row found (token not found)
+		popUpCause = "tokenInvalid"
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	} else { //found a row
+		//checking for already verified or not
+		var isVerified int
+		_ = DB.QueryRow("SELECT isVerified FROM user WHERE token=?", token).Scan(&isVerified)
 
-		if res == sql.ErrNoRows { //no row found (token not found)
-			popUpCause = "tokenInvalid"
+		if isVerified == 1 { //already verified
+			popUpCause = "tokenAlreadyVerified"
 			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else { //found a row
-			//checking for already verified or not
-			var isVerified int
-			_ = DB.QueryRow("SELECT isVerified FROM user WHERE token=?", token).Scan(&isVerified)
+		} else if isVerified == 0 {
+			//checking for token expired or not
+			tokenReceived := time.Now().Unix()
+			diff := tokenReceived - tokenSent
 
-			if isVerified == 1 { //already verified
-				popUpCause = "tokenAlreadyVerified"
+			if diff > (2 * 60 * 60) { //2 hours period
+				popUpCause = "tokenExpired"
 				http.Redirect(w, r, "/", http.StatusSeeOther)
-			} else if isVerified == 0 {
-				//checking for token expired or not
-				tokenReceived := time.Now().Unix()
-				diff := tokenReceived - tokenSent
+			} else {
+				updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenSent=? WHERE token=?")
+				checkErr(err)
+				updateQuery.Exec(tokenReceived, token) //after verified, tokenSent indicates the time of verification
 
-				if diff > (2 * 60 * 60) { //2 hours period
-					popUpCause = "tokenExpired"
-					http.Redirect(w, r, "/", http.StatusSeeOther)
-				} else {
-					updateQuery, err := DB.Prepare("UPDATE user SET isVerified=1,tokenSent=? WHERE token=?")
-					checkErr(err)
-					updateQuery.Exec(tokenReceived, token) //after verified, tokenSent indicates the time of verification
-
-					popUpCause = "tokenVerifiedNow"
-					http.Redirect(w, r, "/", http.StatusSeeOther)
-				}
+				popUpCause = "tokenVerifiedNow"
+				http.Redirect(w, r, "/", http.StatusSeeOther)
 			}
 		}
 	}

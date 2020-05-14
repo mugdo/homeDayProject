@@ -87,42 +87,36 @@ func PassReset(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		path := r.URL.Path
 		runes := []rune(path)
-
-		need := "token="
+		need := "="
 		index := strings.Index(path, need)
+		token := string(runes[index+1:])
 
-		if index == -1 { //url is not like this "/passReset/token="
-			errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
-		} else { //url is "/passReset/token=" something like this
-			token := string(runes[index+6:]) //index+0 = t, on 'token='
+		var email string
+		res := DB.QueryRow("SELECT email FROM resetpassword WHERE token=?", token).Scan(&email)
+		if res == sql.ErrNoRows { //Row not found
+			popUpCause = "passTokenInvalid"
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else { //found a row
+			//checking for token expired or not
+			var tokenSent int64
+			_ = DB.QueryRow("SELECT tokenSent FROM resetpassword WHERE token=?", token).Scan(&tokenSent)
+			tokenReceived := time.Now().Unix() //current time
+			diff := tokenReceived - tokenSent
 
-			var email string
-			res := DB.QueryRow("SELECT email FROM resetpassword WHERE token=?", token).Scan(&email)
-			if res == sql.ErrNoRows { //Row not found
-				popUpCause = "passTokenInvalid"
+			if diff > (2 * 60 * 60) { //2 hours period
+				popUpCause = "passTokenExpired"
 				http.Redirect(w, r, "/", http.StatusSeeOther)
-			} else { //found a row
-				//checking for token expired or not
-				var tokenSent int64
-				_ = DB.QueryRow("SELECT tokenSent FROM resetpassword WHERE token=?", token).Scan(&tokenSent)
-				tokenReceived := time.Now().Unix() //current time
-				diff := tokenReceived - tokenSent
+			} else {
+				session, _ := store.Get(r, "mysession")
 
-				if diff > (2 * 60 * 60) { //2 hours period
-					popUpCause = "passTokenExpired"
-					http.Redirect(w, r, "/", http.StatusSeeOther)
-				} else {
-					session, _ := store.Get(r, "mysession")
+				Info["Username"] = session.Values["username"]
+				Info["Password"] = session.Values["password"]
+				Info["IsLogged"] = session.Values["isLogin"]
+				Info["LastPage"] = lastPage
+				Info["PageTitle"] = "Reset Password"
+				Info["Token"] = token
 
-					Info["Username"] = session.Values["username"]
-					Info["Password"] = session.Values["password"]
-					Info["IsLogged"] = session.Values["isLogin"]
-					Info["LastPage"] = lastPage
-					Info["PageTitle"] = "Reset Password"
-					Info["Token"] = token
-
-					tpl.ExecuteTemplate(w, "passReset.gohtml", Info)
-				}
+				tpl.ExecuteTemplate(w, "passReset.gohtml", Info)
 			}
 		}
 	} else if r.Method == "POST" {

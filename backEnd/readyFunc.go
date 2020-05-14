@@ -169,12 +169,10 @@ func getLanguage(w http.ResponseWriter, r *http.Request) {
 	var languagePack []LanguagePack
 
 	path := r.URL.Path
+	runes := []rune(path)
 	need := "="
 	index := strings.Index(path, need)
-
-	var OJ string
-	runes := []rune(path)
-	OJ = string(runes[index+1:])
+	OJ := string(runes[index+1:])
 
 	if OJ == "AtCoder" {
 		languagePack = []LanguagePack{

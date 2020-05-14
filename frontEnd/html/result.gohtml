@@ -1,0 +1,37 @@
+{{ template "head" . }}
+
+<div id="content">
+    <h2>Submission Result</h2>
+
+    <p style="display: none;" id="subID" style="color: blueviolet;">{{ .SubID }}</p>
+    <p id="res">Submitting</p>
+
+    <table>
+        <th>
+            <td>Submission ID</td>
+            <td>OJ</td>
+            <td>Problem Number</td>
+            <td>Verdict</td>
+            <td>Time (ms)</td>
+            <td>Memory (kb)</td>
+            <td>Language</td>
+            <td>Submit Time</td>
+        </th>
+        <tr>
+            <td>{{ .SubID }}</td>
+            <td>{{ .OJ }}</td>
+            {{ $link := (printf "/problemView/%s-%s" .OJ .PNum) }}
+            <td><a href="{{ $link }}">{{ .PNum }}</a></td>
+            <td id="verdict"></td>
+            <td id="time"></td>
+            <td id="memory"></td>
+            <td>{{ .Language }}</td>
+            <td id="submitTime"></td>
+        </tr>
+        <tr>
+            <td>{{ .SourceCode }}</td>
+        </tr>
+    </table>
+</div>
+
+{{ template "close" . }}

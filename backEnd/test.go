@@ -9,10 +9,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"time"
 
 	"golang.org/x/net/html"
 )
- 
+
 func Body(doc *html.Node) (*html.Node, error) {
 	var body *html.Node
 	var crawler func(*html.Node)
@@ -80,12 +81,9 @@ func Test2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	//fmt.Fprintf(w, "Hello Res")
 
-	// test := r.FormValue("test")
-	// fmt.Println(test)
-
-	// data := map[string]interface{}{
-	// 	"Test": test,
-	// }
+	fmt.Println(time.Now().Unix())
+	fmt.Println(time.Now().Local())
+	fmt.Println(time.Unix(time.Now().Unix(),0))
 
 	tpl.ExecuteTemplate(w, "test2.gohtml", nil)
 }
