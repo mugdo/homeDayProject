@@ -40,7 +40,7 @@ func rPOST(urlStr string, data url.Values) ([]byte, error) {
 
 	return body, err
 }
-func pSearch(OJ, pNum, pName, start, length string) ([]byte, error) {
+func pSearch(OJ, pNum, pName, length string) ([]byte, error) {
 	apiURL := "https://vjudge.net/problem/data"
 
 	data := url.Values{
@@ -92,7 +92,7 @@ func pSearch(OJ, pNum, pName, start, length string) ([]byte, error) {
 		"search[value]":             {""},
 		"search[regex]":             {"false"},
 
-		"start":    {start},
+		"start":    {"0"},
 		"length":   {length},
 		"OJId":     {OJ},
 		"probNum":  {pNum},

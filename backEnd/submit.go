@@ -3,7 +3,6 @@ package backEnd
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -99,7 +98,7 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 								http.Redirect(w, r, "/submit", http.StatusSeeOther)
 							} else { //got a problem with this OJ & pNum
 								//checking whether problem submit allowed or not
-								tempP, _ := pSearch(OJ, pNum, "", "", "20")
+								tempP, _ := pSearch(OJ, pNum, "", "20")
 								tempList := getPList(tempP)
 
 								allowSubmit := false

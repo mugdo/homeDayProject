@@ -17,33 +17,19 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	pName := r.FormValue("pName")
 
 	var pListNew []Inner
-	var start = 0
-	var length = "20"
+	var length = "1000"
 
-	//taking 20 problem
-	for i := 0; i < 999999; i++ {
-		body, err := pSearch(OJ, pNum, pName, strconv.Itoa(start), length)
-		checkErr(err)
+	body, err := pSearch(OJ, pNum, pName, length)
+	checkErr(err)
+	pList := getPList(body)
 
-		pList := getPList(body)
-
-		if len(pList.Data) == 0 { //if no problem list found
-			break
-		} else { //getting problem one by one
-			for j := 0; j < len(pList.Data); j++ {
-				if OJSet[pList.Data[j].OriginOJ] { //if problem come from desired OJ
-					pListNew = append(pListNew, pList.Data[j])
-				}
-				if len(pListNew) >= 20 { //got 20 problem
-					break
-				}
-			}
+	for i := 0; i < len(pList.Data); i++ { //getting problem one by one
+		if OJSet[pList.Data[i].OriginOJ] { //if problem come from desired OJ
+			pListNew = append(pListNew, pList.Data[i])
 		}
-		if len(pListNew) >= 20 { //checking again, got 20 problem
+		if len(pListNew) >= 20 { //got 20 problem
 			break
 		}
-		len, _ := strconv.Atoi(length)
-		start = start + len
 	}
 
 	found := true
@@ -136,7 +122,7 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 				}
 
 				//checking whether problem submission allowed or not
-				tempP, _ := pSearch(OJ, pNum, "", "", "20")
+				tempP, _ := pSearch(OJ, pNum, "", "20")
 				tempList := getPList(tempP)
 
 				allowSubmit := false
