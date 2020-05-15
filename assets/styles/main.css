@@ -17,7 +17,7 @@ body{
     background-color: lightpink;
     border: 1px solid darksalmon;
 }
-#navBar{
+.navBar{
     border-top: 1px solid #1f74ad;
     border-bottom: 1px solid #1f74ad;
     height: 40px;
@@ -253,8 +253,8 @@ body{
     left:0px;
     content:'';
     background:rgba(0,0,0,0.85);
-  }
-  .popup-box {
+}
+.popup-box {
     width:400px;
     padding:70px;
     transform:translate(-50%, -50%) scale(0.5);
@@ -265,46 +265,46 @@ body{
     border-radius:3px;
     background:#fff;
     text-align:center;
-  }
-  .popup-box h2 {
-      color:#1a1a1a;
-  }
-  .popup-box h3 {
-      color:#888;
-  }
-  .close-btn {
-      width:35px;
-      height:35px;
-      display:inline-block;
-      position:absolute;
-      top:10px;
-      right:10px;
-      -webkit-transition:all ease 0.5s;
-      transition:all ease 0.5s;
-      border-radius:1000px;
-      background:#d75f70;
-      font-weight:bold;
-      text-decoration:none;
-      color:#fff;
-      line-height:190%;
-  }
-  .close-btn:hover {
-      -webkit-transform:rotate(180deg);
-      transform:rotate(180deg);
-  }
-  
-  .transform-in, .transform-out {
+}
+.popup-box h2 {
+    color:#1a1a1a;
+}
+.popup-box h3 {
+    color:#888;
+}
+.close-btn {
+    width:35px;
+    height:35px;
+    display:inline-block;
+    position:absolute;
+    top:10px;
+    right:10px;
+    -webkit-transition:all ease 0.5s;
+    transition:all ease 0.5s;
+    border-radius:1000px;
+    background:#d75f70;
+    font-weight:bold;
+    text-decoration:none;
+    color:#fff;
+    line-height:190%;
+}
+.close-btn:hover {
+    -webkit-transform:rotate(180deg);
+    transform:rotate(180deg);
+}
+
+.transform-in, .transform-out {
     display:block;
     -webkit-transition:all ease 0.5s;
     transition:all ease 0.5s;
-  }
-  
-  .transform-in {
-      -webkit-transform:translate(-50%, -50%) scale(1);
-      transform:translate(-50%, -50%) scale(1);
-  }
-  
-  .transform-out {
-      -webkit-transform:translate(-50%, -50%) scale(0.5);
-      transform:translate(-50%, -50%) scale(0.5);
-  }
+}
+
+.transform-in {
+    -webkit-transform:translate(-50%, -50%) scale(1);
+    transform:translate(-50%, -50%) scale(1);
+}
+
+.transform-out {
+    -webkit-transform:translate(-50%, -50%) scale(0.5);
+    transform:translate(-50%, -50%) scale(0.5);
+}

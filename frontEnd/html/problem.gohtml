@@ -1,16 +1,14 @@
 {{ template "head" . }}
 
 <div id="content">
-    <table>
+    <table id="problemTable">
         <tr>
-            <th>Status</td>
             <th>OJ</th>
             <th>Prob Number</th>
             <th>Prob Name</th>
         </tr>
         <tr>
-            <form action="/problem" method="POST">
-                <td></td>
+            <form method="POST">
                 <td>
                     <select name="OJ">
                         {{ if ne .OJ "" }}
@@ -67,7 +65,7 @@
             <td>No Problem Found</td>
         </tr>
         {{ end }}
-        {{ range $i:= .PList }}
+        {{/* {{ range $i:= .PList }}
         <tr>
             <td></td>
             <td>{{ $i.OriginOJ }}</td>
@@ -75,8 +73,14 @@
             {{ $link := (printf "/problemView/%s-%s" $i.OriginOJ $i.OriginProb) }}
             <td><a href={{ $link }}>{{ $i.Title }}</a></td>
         </tr>
-        {{ end }}
+        {{ end }} */}}
     </table>
+    <div class="navBar">
+        <div id="navLeft" style="margin-left:300px;">
+            <ul id="pageUL">
+            </ul>
+        </div>
+    </div>
 </div>
 
 {{ template "close" . }}

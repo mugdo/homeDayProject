@@ -27,9 +27,6 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 		if OJSet[pList.Data[i].OriginOJ] { //if problem come from desired OJ
 			pListNew = append(pListNew, pList.Data[i])
 		}
-		if len(pListNew) >= 20 { //got 20 problem
-			break
-		}
 	}
 
 	found := true
