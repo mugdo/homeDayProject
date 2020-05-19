@@ -4,14 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"golang.org/x/net/html"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
-	"time"
-
-	"golang.org/x/net/html"
 )
 
 func Body(doc *html.Node) (*html.Node, error) {
@@ -80,10 +78,6 @@ func Test1(w http.ResponseWriter, r *http.Request) {
 func Test2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	//fmt.Fprintf(w, "Hello Res")
-
-	fmt.Println(time.Now().Unix())
-	fmt.Println(time.Now().Local())
-	fmt.Println(time.Unix(time.Now().Unix(),0))
 
 	tpl.ExecuteTemplate(w, "test2.gohtml", nil)
 }
