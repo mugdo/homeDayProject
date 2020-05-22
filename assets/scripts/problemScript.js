@@ -5,7 +5,9 @@ function processPList(getPList) {
     console.log(getPList)
     pList = getPList;
     totalPages = Math.ceil(pList.length / 20); //20 problem per page
-    rightBound = (totalPages - 9) * -(shiftX); //9block in a first page-line.
+
+    displayingPageNum = Math.min(9, totalPages) //by default 9 pageNum displayed on pagination
+    rightBound = (totalPages - displayingPageNum) * -(shiftX);
 }
 
 var pageUL = $('#pageUL')
@@ -14,6 +16,11 @@ $(window).on("load", function () {
     for (i = 1; i <= totalPages; i++) {
         pageUL.append(`<li><a id="pageBox` + i + `" href="#" onclick="showProblem(` + i + `)">` + i + `</a></li>`);
     }
+    //width fixing of pagination
+    pagerWidth = displayingPageNum * 32
+    $("#pagination").css("width", pagerWidth + "px");
+    $("#pager").css("width", (pagerWidth + 140) + "px"); //extra 140px for 'pre/next' button
+
     //onload-showing problem of  page 1
     showProblem(1);
 });

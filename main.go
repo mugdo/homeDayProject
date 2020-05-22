@@ -40,7 +40,7 @@ func main() {
 	r.HandleFunc("/result", backEnd.Result)
 	r.PathPrefix("/verdict/subID=").HandlerFunc(backEnd.Verdict)
 
-	// r.HandleFunc("/scrap", backEnd.Scrap)
+	r.HandleFunc("/scrap", backEnd.Scrap)
 	// r.HandleFunc("/toph", backEnd.Toph)
 	// r.HandleFunc("/des", backEnd.Des)
 	r.HandleFunc("/test2", backEnd.Test2)
