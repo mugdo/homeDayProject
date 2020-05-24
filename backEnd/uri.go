@@ -3,57 +3,17 @@ package backEnd
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/gocolly/colly"
 )
 
-var c = colly.NewCollector(
-//colly.AllowedDomains("localhost"),
-)
-
-func getCsrfToken(apiURL string) string {
-	var csrfToken string
-	c.OnHTML("input[name='csrf_token']", func(e *colly.HTMLElement) {
-		csrfToken = e.Attr("value")
-	})
-	c.Visit(apiURL)
-
-	return csrfToken
-}
-func getFtaa(apiURL string, w http.ResponseWriter) {
-	//var ftaa string
-	client := &http.Client{
-		Jar: cookieJar,
-	}
-	req, err := http.NewRequest("GET", "http://codeforces.com/enter", nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-	resp, err := client.Do(req)
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-
-	client = &http.Client{
-		Jar: cookieJar,
-	}
-	req, err = http.NewRequest("GET", apiURL, nil)
-	if err != nil {
-		fmt.Println(err)
-	}
-	resp, err = client.Do(req)
-	body, err = ioutil.ReadAll(resp.Body)
-	fmt.Println(string(body))
-	fmt.Fprintln(w, string(body))
-
-	//return csrfToken
-}
-
-func Scrap(w http.ResponseWriter, r *http.Request) {
+func loginURI() string {
 	pURL := "https://www.urionlinejudge.com.br/judge/en/login"
 	req, err := http.NewRequest("GET", pURL, nil)
 	req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
@@ -92,9 +52,27 @@ func Scrap(w http.ResponseWriter, r *http.Request) {
 	resp := document.Find("div[class='h-user']").Find("i").Text()
 
 	if resp == "ajudge.bd@gmail.com" {
-		fmt.Println(resp)
+		return "success"
+	} else {
+		return "failed"
+	}
+}
+func URISearch(sQuery string) []byte {
+	var res []byte
+	var pURL string
 
-		pURL := "https://www.urionlinejudge.com.br/judge/en/search?q=hard&for=problems"
+	if sQuery == "URI Only" {
+		rand.Seed(time.Now().UnixNano())
+		min := 1
+		max := 83
+		pageNum := rand.Intn(max-min+1) + min
+
+		pURL = "https://www.urionlinejudge.com.br/judge/en/problems/all?page="+strconv.Itoa(pageNum)
+	} else {
+		pURL = "https://www.urionlinejudge.com.br/judge/en/search?q=" + sQuery + "&for=problems"
+	}
+
+	if loginURI() == "success" {
 		req, err := http.NewRequest("GET", pURL, nil)
 		req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 		response, err := client.Do(req)
@@ -103,10 +81,18 @@ func Scrap(w http.ResponseWriter, r *http.Request) {
 		document, err := goquery.NewDocumentFromReader(response.Body)
 		checkErr(err)
 
-		var uNumList,uNameList []string
-		var uNum,uName string
+		var uNumList, uNameList []string
+		var uNum, uName string
 
+		document.Find("td[class='id']").Each(func(index int, linkStr *goquery.Selection) {
+			uNum = linkStr.Find("a").Text()
+			uNumList = append(uNumList, uNum)
+		})
 		document.Find("td[class='id ']").Each(func(index int, linkStr *goquery.Selection) {
+			uNum = linkStr.Find("a").Text()
+			uNumList = append(uNumList, uNum)
+		})
+		document.Find("td[class='id tour-step-1001']").Each(func(index int, linkStr *goquery.Selection) {
 			uNum = linkStr.Find("a").Text()
 			uNumList = append(uNumList, uNum)
 		})
@@ -115,24 +101,28 @@ func Scrap(w http.ResponseWriter, r *http.Request) {
 			uNameList = append(uNameList, uName)
 		})
 
-		type list struct{
-			Num,Name string
+		type list struct {
+			Num, Name string
 		}
 		var uList []list
-		for i:=0;i<len(uNumList);i++{
-			temp:=list{uNumList[i],uNameList[i]}
+		for i := 0; i < len(uNumList); i++ {
+			temp := list{uNumList[i], uNameList[i]}
 
-			uList = append(uList,temp)
+			uList = append(uList, temp)
 		}
-		b,err:=json.Marshal(uList)
-		checkErr(err)
 
-		for i := 0; i < len(uList); i++ {
-			fmt.Println(i+1,uList[i].Num,uList[i].Name)
-		}
-		fmt.Println(string(b))
-		fmt.Fprintln(w,string(b))
-
-		fmt.Println("End")
+		res, _ = json.Marshal(uList)
 	}
+
+	return res
+}
+
+func Scrap(w http.ResponseWriter, r *http.Request) {
+	rr, _ := rGET("https://www.urionlinejudge.com.br/repository/UOJ_1001_en.html")
+	fmt.Println(string(rr))
+
+	Info["Isrc"] = string(rr)
+	tpl.ExecuteTemplate(w, "test2.gohtml", nil)
+
+	fmt.Println("End")
 }

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
+	"golang.org/x/net/html"
 	"html/template"
 	"io"
 	"io/ioutil"
@@ -11,9 +13,6 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
-
-	"github.com/PuerkitoBio/goquery"
-	"golang.org/x/net/html"
 )
 
 func Body(doc *html.Node) (*html.Node, error) {
@@ -82,13 +81,16 @@ func Test1(w http.ResponseWriter, r *http.Request) {
 func Test2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	//fmt.Fprintf(w, "Hello Res")
-	goGet(w)
-	//tpl.ExecuteTemplate(w, "test2.gohtml", nil)
+
+	URISearch("easy")
+
+	tpl.ExecuteTemplate(w, "test2.gohtml", nil)
 }
 func TestSub(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 	//fmt.Fprintf(w, "Hello")
 	//tpl.ExecuteTemplate(w, "test.gohtml", nil)
+
 	http.Redirect(w, r, "/testPage", http.StatusSeeOther)
 }
 
@@ -261,7 +263,7 @@ func goGet(w http.ResponseWriter) {
 				headings = append(headings, tableheading.Text())
 			})
 			rowhtml.Find("td[class='id ']").Find("a").Each(func(indexth int, tablecell *goquery.Selection) {
-				temp,_:=tablecell.Attr("href")
+				temp, _ := tablecell.Attr("href")
 				row = append(row, temp)
 			})
 			rows = append(rows, row)
@@ -272,7 +274,7 @@ func goGet(w http.ResponseWriter) {
 	fmt.Println("####### rows = ", len(rows), rows)
 
 	for i := 0; i < len(rows); i++ {
-		fmt.Println(rows[i],rows[i])
-		fmt.Fprintln(w,rows[i],rows[i])
+		fmt.Println(rows[i], rows[i])
+		fmt.Fprintln(w, rows[i], rows[i])
 	}
 }

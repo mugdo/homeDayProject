@@ -39,6 +39,8 @@ func main() {
 
 	r.HandleFunc("/result", backEnd.Result)
 	r.PathPrefix("/verdict/subID=").HandlerFunc(backEnd.Verdict)
+	
+	//URI related
 
 	r.HandleFunc("/scrap", backEnd.Scrap)
 	// r.HandleFunc("/toph", backEnd.Toph)

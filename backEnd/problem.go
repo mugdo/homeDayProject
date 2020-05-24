@@ -2,11 +2,15 @@ package backEnd
 
 import (
 	"encoding/json"
-	"github.com/PuerkitoBio/goquery"
+	"fmt"
 	"html/template"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func Problem(w http.ResponseWriter, r *http.Request) {
@@ -16,21 +20,63 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	pNum := r.FormValue("pNum")
 	pName := r.FormValue("pName")
 
-	var pListNew []Inner
-	var length = "1000"
+	var pListFinal []Inner
 
-	body, err := pSearch(OJ, pNum, pName, length)
-	checkErr(err)
-	pList := getPList(body)
+	//searching problem from URI first
+	var pURIb []byte
+	if OJ == "" || OJ == "All" || OJ == "URI" {
+		if pName != "" {
+			pURIb = URISearch(pName)
+		} else if pNum != "" {
+			pURIb = URISearch(pNum)
+		} else {
+			if OJ == "URI" {
+				pURIb = URISearch("URI Only")
+			} else {
+				rand.Seed(time.Now().UnixNano())
+				min := 1001
+				max := 3100
+				sQuery := rand.Intn(max-min+1) + min
+				pURIb = URISearch(strconv.Itoa(sQuery))
+			}
+		}
+		type pListURI struct {
+			Num  string `json:"Num"`
+			Name string `json:"Name"`
+		}
+		var pURI []pListURI
+		json.Unmarshal(pURIb, &pURI)
 
-	for i := 0; i < len(pList.Data); i++ { //getting problem one by one
-		if OJSet[pList.Data[i].OriginOJ] { //if problem come from desired OJ
-			pListNew = append(pListNew, pList.Data[i])
+		for i := 0; i < len(pURI); i++ {
+			var temp Inner
+
+			temp.AllowSubmit = true
+			temp.ID = 0
+			temp.IsFav = 0
+			temp.OriginOJ = "URI"
+			temp.OriginProb = pURI[i].Num
+			temp.Status = 0
+			temp.Title = pURI[i].Name
+			temp.TriggerTime = 0
+
+			pListFinal = append(pListFinal, temp)
+		}
+	}
+	if OJ != "URI" {
+		var length = "1000"
+		body, err := pSearch(OJ, pNum, pName, length)
+		checkErr(err)
+		pList := getPList(body)
+
+		for i := 0; i < len(pList.Data); i++ { //getting problem one by one
+			if OJSet[pList.Data[i].OriginOJ] { //if problem come from desired OJ
+				pListFinal = append(pListFinal, pList.Data[i])
+			}
 		}
 	}
 
 	found := true
-	if len(pListNew) == 0 { //if no problem list found
+	if len(pListFinal) == 0 { //if no problem list found
 		found = false
 	}
 
@@ -40,7 +86,7 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	Info["Username"] = session.Values["username"]
 	Info["Password"] = session.Values["password"]
 	Info["IsLogged"] = session.Values["isLogin"]
-	Info["PList"] = pListNew
+	Info["PList"] = pListFinal
 	Info["Found"] = found
 	Info["OJ"] = OJ
 	Info["PNum"] = pNum

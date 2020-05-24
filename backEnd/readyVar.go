@@ -28,6 +28,7 @@ var OJSet = map[string]bool{
 	"HackerRank": true,
 	"LightOJ":    true,
 	"TopCoder":   true,
+	"URI":        true,
 	"UVA":        true,
 }
 
