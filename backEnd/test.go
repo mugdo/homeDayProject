@@ -82,9 +82,9 @@ func Test2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	//fmt.Fprintf(w, "Hello Res")
 
-	URISearch("easy")
+	URIGet("3016")
 
-	tpl.ExecuteTemplate(w, "test2.gohtml", nil)
+	tpl.ExecuteTemplate(w, "test2.gohtml", Info)
 }
 func TestSub(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")

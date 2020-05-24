@@ -26,7 +26,9 @@
     </div>
     <div id="lowerContent">
         <div id="problemDescription">
-            {{ if eq .OJ "UVA" }}
+            {{ if eq .OJ "URI" }}
+                {{ .URIProblem.Des }}
+            {{ else if eq .OJ "UVA" }}
                 {{ $link := (printf "https://onlinejudge.org/external/%s/p%s.pdf" .UvaSegment .PNum) }}
                 <center><iframe src="{{ $link }}" width= "70%" height= "1000px" frameborder= "0"></iframe></center>
             {{/* {{ else if eq .OJ "UVALive" }}

@@ -2,8 +2,8 @@ package backEnd
 
 import (
 	"encoding/json"
-	"fmt"
 	"html/template"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -116,90 +116,102 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 		if OJSet[OJ] == false || pNum == "" { //bad url, not OJ & pNum specified
 			errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 		} else { // got something in OJ and pNum
-			//Finding problem Title, Time limit, Memory limit, Description source(pDesSrc)
-			findPResource(OJ, pNum)
+			allowSubmit := false //just for declaring, need later
+			var uvaSegment string
+			problem := []map[string]interface{}{}
+			URIProblem := map[string]interface{}{}
 
-			if pDesSrc == "" { //didn't get any problem
-				errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
-			} else { //got a problem and resources
-				// getting problem description
-				pURL := "https://vjudge.net" + pDesSrc //value of pDesSrc came from findPResource(OJ, pNum) function
-				req, err := http.NewRequest("GET", pURL, nil)
-				req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-				response, err := client.Do(req)
-				defer response.Body.Close()
+			if OJ == "URI" {
+				URIProblem["Des"] = template.HTML(URIGet(pNum))
+				allowSubmit = true
 
-				document, err := goquery.NewDocumentFromReader(response.Body)
-				checkErr(err)
-
-				textArea := document.Find("textarea").Text()
-				b := []byte(textArea)
-
-				type Inner2 struct {
-					Format  string `json:"format"`
-					Content string `json:"content"`
+				if pTitle==""{
+					errorPage(w,http.StatusBadRequest)
+					return
 				}
-				type Inner struct {
-					Title string `json:"title"`
-					Value Inner2 `json:"value"`
-				}
-				type Res struct {
-					Trustable bool    `json:"trustable"`
-					Sections  []Inner `json:"sections"`
-				}
-				var res Res
-				json.Unmarshal(b, &res)
+			} else {
+				//Finding problem Title, Time limit, Memory limit, Description source(pDesSrc)
+				findPResource(OJ, pNum)
 
-				problem := []map[string]interface{}{}
+				if pDesSrc == "" { //didn't get any problem
+					errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
+				} else { //got a problem and resources
+					// getting problem description
+					pURL := "https://vjudge.net" + pDesSrc //value of pDesSrc came from findPResource(OJ, pNum) function
+					req, err := http.NewRequest("GET", pURL, nil)
+					req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+					response, err := client.Do(req)
+					defer response.Body.Close()
 
-				for i := 0; i < len(res.Sections); i++ {
-					//Eliminating Default CSS on Example-Input-Output
-					styleBody := res.Sections[i].Value.Content
-					content := removeStyle(styleBody)
+					document, err := goquery.NewDocumentFromReader(response.Body)
+					checkErr(err)
 
-					mp := map[string]interface{}{
-						"Title":   template.HTML(res.Sections[i].Title),
-						"Content": template.HTML(content),
+					textArea := document.Find("textarea").Text()
+					b := []byte(textArea)
+
+					type Inner2 struct {
+						Format  string `json:"format"`
+						Content string `json:"content"`
 					}
-					problem = append(problem, mp)
+					type Inner struct {
+						Title string `json:"title"`
+						Value Inner2 `json:"value"`
+					}
+					type Res struct {
+						Trustable bool    `json:"trustable"`
+						Sections  []Inner `json:"sections"`
+					}
+					var res Res
+					json.Unmarshal(b, &res)
+
+					for i := 0; i < len(res.Sections); i++ {
+						//Eliminating Default CSS on Example-Input-Output
+						styleBody := res.Sections[i].Value.Content
+						content := removeStyle(styleBody)
+
+						mp := map[string]interface{}{
+							"Title":   template.HTML(res.Sections[i].Title),
+							"Content": template.HTML(content),
+						}
+						problem = append(problem, mp)
+					}
+
+					//checking whether problem submission allowed or not
+					tempP, _ := pSearch(OJ, pNum, "", "20")
+					tempList := getPList(tempP)
+
+					if tempList.Data[0].AllowSubmit == true && tempList.Data[0].Status == 0 {
+						allowSubmit = true
+					}
+
+					//for uva pdf description
+					if OJ == "UVA" {
+						temp, _ := strconv.Atoi(pNum)
+
+						IntSegment := temp / 100
+						uvaSegment = strconv.Itoa(IntSegment)
+					}
 				}
-
-				//checking whether problem submission allowed or not
-				tempP, _ := pSearch(OJ, pNum, "", "20")
-				tempList := getPList(tempP)
-
-				allowSubmit := false
-				if tempList.Data[0].AllowSubmit == true && tempList.Data[0].Status == 0 {
-					allowSubmit = true
-				}
-
-				//for uva pdf description
-				var uvaSegment string
-				if OJ == "UVA" {
-					temp, _ := strconv.Atoi(pNum)
-
-					IntSegment := temp / 100
-					uvaSegment = strconv.Itoa(IntSegment)
-				}
-
-				lastPage = r.URL.Path
-				session, _ := store.Get(r, "mysession")
-
-				Info["Username"] = session.Values["username"]
-				Info["Password"] = session.Values["password"]
-				Info["IsLogged"] = session.Values["isLogin"]
-				Info["PageTitle"] = pTitle
-				Info["OJ"] = OJ
-				Info["PNum"] = pNum
-				Info["AllowSubmit"] = allowSubmit
-				Info["UvaSegment"] = uvaSegment
-				Info["PName"] = pTitle
-				Info["TimeLimit"] = pTimeLimit
-				Info["MemoryLimit"] = pMemoryLimit
-				Info["Problem"] = problem
-
-				tpl.ExecuteTemplate(w, "problemView.gohtml", Info)
 			}
+
+			lastPage = r.URL.Path
+			session, _ := store.Get(r, "mysession")
+
+			Info["Username"] = session.Values["username"]
+			Info["Password"] = session.Values["password"]
+			Info["IsLogged"] = session.Values["isLogin"]
+			Info["PageTitle"] = pTitle
+			Info["OJ"] = OJ
+			Info["PNum"] = pNum
+			Info["AllowSubmit"] = allowSubmit
+			Info["UvaSegment"] = uvaSegment
+			Info["PName"] = pTitle
+			Info["TimeLimit"] = pTimeLimit
+			Info["MemoryLimit"] = pMemoryLimit
+			Info["Problem"] = problem
+			Info["URIProblem"] = URIProblem
+
+			tpl.ExecuteTemplate(w, "problemView.gohtml", Info)
 		}
 	}
 }
@@ -225,26 +237,48 @@ func Origin(w http.ResponseWriter, r *http.Request) {
 		if OJSet[OJ] == false || pNum == "" { //bad url, not OJ & pNum specified
 			errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
 		} else { // got something in OJ and pNum
-			//Finding origin
-			pURL := "https://vjudge.net/problem/" + OJ + "-" + pNum
+			if OJ == "URI" {
+				pOrigin = "https://www.urionlinejudge.com.br/judge/en/problems/view/" + pNum
 
-			req, err := http.NewRequest("GET", pURL, nil)
-			req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
-			response, err := client.Do(req)
-			defer response.Body.Close()
+				req, _ := http.NewRequest("GET", pOrigin, nil)
+				req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+				response, _ := client.Do(req)
+				defer response.Body.Close()
+				res,_:=ioutil.ReadAll(response.Body)
+				sRes:=string(res)
 
-			document, err := goquery.NewDocumentFromReader(response.Body)
-			checkErr(err)
+				need:="iframe"
+				index:=strings.Index(sRes, need)
 
-			pOrigin, _ = document.Find("span[class='origin']").Find("a").Attr("href")
+				if index == -1 { //didn't get any problem
+					errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
+				} else {
+					//redirecting to the origin site
+					http.Redirect(w, r, pOrigin, http.StatusSeeOther)
+				}
+			} else {
+				//Finding origin
+				pURL := "https://vjudge.net/problem/" + OJ + "-" + pNum
 
-			if pOrigin == "" { //didn't get any problem
-				errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
-			} else { //got a problem and origin
-				//getting origin link
-				pOrigin = getOriginLink("https://vjudge.net" + pOrigin)
+				req, err := http.NewRequest("GET", pURL, nil)
+				req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+				response, err := client.Do(req)
+				defer response.Body.Close()
 
-				http.Redirect(w, r, pOrigin, http.StatusSeeOther)
+				document, err := goquery.NewDocumentFromReader(response.Body)
+				checkErr(err)
+
+				pOrigin, _ = document.Find("span[class='origin']").Find("a").Attr("href")
+
+				if pOrigin == "" { //didn't get any problem
+					errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400
+				} else { //got a problem and origin
+					//getting origin link
+					pOrigin = getOriginLink("https://vjudge.net" + pOrigin)
+
+					//redirecting to the origin site
+					http.Redirect(w, r, pOrigin, http.StatusSeeOther)
+				}
 			}
 		}
 	}

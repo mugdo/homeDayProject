@@ -3,14 +3,13 @@ package backEnd
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"math/rand"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 func loginURI() string {
@@ -67,7 +66,7 @@ func URISearch(sQuery string) []byte {
 		max := 83
 		pageNum := rand.Intn(max-min+1) + min
 
-		pURL = "https://www.urionlinejudge.com.br/judge/en/problems/all?page="+strconv.Itoa(pageNum)
+		pURL = "https://www.urionlinejudge.com.br/judge/en/problems/all?page=" + strconv.Itoa(pageNum)
 	} else {
 		pURL = "https://www.urionlinejudge.com.br/judge/en/search?q=" + sQuery + "&for=problems"
 	}
@@ -115,6 +114,27 @@ func URISearch(sQuery string) []byte {
 	}
 
 	return res
+}
+func URIGet(pNum string) string {
+	pURL := "https://www.urionlinejudge.com.br/repository/UOJ_" + pNum + "_en.html"
+	var URIDes string
+
+	if loginURI() == "success" {
+		req, err := http.NewRequest("GET", pURL, nil)
+		req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+		response, err := client.Do(req)
+		defer response.Body.Close()
+
+		document, err := goquery.NewDocumentFromReader(response.Body)
+		checkErr(err)
+
+		pTitle = document.Find("div[class='header']").Find("h1").Text()
+		pTimeLimit = document.Find("div[class='header']").Find("strong").Text()
+		pTimeLimit = strings.TrimPrefix(pTimeLimit, "Timelimit: ")
+
+		URIDes, _ = document.Find("div[class='problem']").Html()
+	}
+	return URIDes
 }
 
 func Scrap(w http.ResponseWriter, r *http.Request) {
