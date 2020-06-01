@@ -90,42 +90,55 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 							http.Redirect(w, r, "/submit", http.StatusSeeOther)
 						} else { // got something in OJ and pNum
 							pDesSrc = "" //resetting for now
-							//(Finding problem) Verifying that problem exist with this OJ & pNum
-							findPResource(OJ, pNum)
+							allowSubmit := false
 
-							if pDesSrc == "" { //didn't get any problem
-								pTitle, pTimeLimit, pMemoryLimit, pDesSrc, pOrigin = "", "", "", "", ""
-								http.Redirect(w, r, "/submit", http.StatusSeeOther)
-							} else { //got a problem with this OJ & pNum
-								//checking whether problem submit allowed or not
-								tempP, _ := pSearch(OJ, pNum, "", "20")
-								tempList := getPList(tempP)
+							if OJ == "URI" {
+								_ = URIGet(pNum)
 
-								allowSubmit := false
-								if tempList.Data[0].AllowSubmit == true && tempList.Data[0].Status == 0 {
-									allowSubmit = true
+								if pTitle == "" { //didn't get any problem
+									pTitle, pTimeLimit, pMemoryLimit, pDesSrc, pOrigin = "", "", "", "", ""
+									http.Redirect(w, r, "/submit", http.StatusSeeOther)
+									return
 								}
+								//else got a problem with this OJ & pNum
+								allowSubmit = true
+							} else {
+								//(Finding problem) Verifying that problem exist with this OJ & pNum
+								findPResource(OJ, pNum)
 
-								if allowSubmit == true {
-									Info["Username"] = session.Values["username"]
-									Info["Password"] = session.Values["password"]
-									Info["IsLogged"] = session.Values["isLogin"]
-									Info["Lastpage"] = lastPage
-									Info["PopUpCause"] = popUpCause
-									Info["ErrorType"] = errorType
-									Info["PageTitle"] = "Submission"
-									Info["OJ"] = OJ
-									Info["PNum"] = pNum
-									Info["PName"] = pTitle
-									Info["TimeLimit"] = pTimeLimit
-									Info["MemoryLimit"] = pMemoryLimit
+								if pDesSrc == "" { //didn't get any problem
+									pTitle, pTimeLimit, pMemoryLimit, pDesSrc, pOrigin = "", "", "", "", ""
+									http.Redirect(w, r, "/submit", http.StatusSeeOther)
+								} else { //got a problem with this OJ & pNum
+									//checking whether problem submit allowed or not
+									tempP, _ := pSearch(OJ, pNum, "", "20")
+									tempList := getPList(tempP)
 
-									tpl.ExecuteTemplate(w, "submit.gohtml", Info)
-									popUpCause = ""
-								} else if allowSubmit == false {
-									link := "/problemView/" + OJ + "-" + pNum
-									http.Redirect(w, r, link, http.StatusSeeOther)
+									if tempList.Data[0].AllowSubmit == true && tempList.Data[0].Status == 0 {
+										allowSubmit = true
+									}
 								}
+							}
+
+							if allowSubmit == true {
+								Info["Username"] = session.Values["username"]
+								Info["Password"] = session.Values["password"]
+								Info["IsLogged"] = session.Values["isLogin"]
+								Info["Lastpage"] = lastPage
+								Info["PopUpCause"] = popUpCause
+								Info["ErrorType"] = errorType
+								Info["PageTitle"] = "Submission"
+								Info["OJ"] = OJ
+								Info["PNum"] = pNum
+								Info["PName"] = pTitle
+								Info["TimeLimit"] = pTimeLimit
+								Info["MemoryLimit"] = pMemoryLimit
+
+								tpl.ExecuteTemplate(w, "submit.gohtml", Info)
+								popUpCause = ""
+							} else if allowSubmit == false {
+								link := "/problemView/" + OJ + "-" + pNum
+								http.Redirect(w, r, link, http.StatusSeeOther)
 							}
 						}
 					}
@@ -141,6 +154,12 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
 		}
 	} else if r.Method == "POST" {
+		OJ := r.FormValue("OJ")
+		if OJ == "URI" {
+			URISubmit(w, r)
+			return
+		}
+		//if other OJ
 		//do login first
 		body, err := rLogin("ajudgebd", "aj199273", "https://vjudge.net/user/login")
 		checkErr(err)
@@ -203,9 +222,9 @@ func Submit(w http.ResponseWriter, r *http.Request) {
 				Info["PageTitle"] = "Result"
 				Info["SubID"] = id //sending submit id to frontend for getting the verdict with ajax call
 				Info["OJ"] = r.FormValue("OJ")
-				Info["PNum"] = r.FormValue("pNum")
+				Info["PNum"] = strings.TrimSpace(r.FormValue("pNum"))
 				Info["Language"] = r.FormValue("language")
-				Info["SourceCode"] = r.FormValue("source")
+				Info["SourceCode"] = strings.TrimSpace(r.FormValue("source"))
 
 				http.Redirect(w, r, "/result", http.StatusSeeOther)
 			}

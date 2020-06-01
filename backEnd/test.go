@@ -80,11 +80,27 @@ func Test1(w http.ResponseWriter, r *http.Request) {
 }
 func Test2(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	//fmt.Fprintf(w, "Hello Res")
+	fmt.Fprintf(w, "Hello Res")
 
-	URIGet("3016")
+	if loginURI() == "success" {
+		req, _ := http.NewRequest("GET", "https://www.urionlinejudge.com.br/judge/en/runs/code/18359922", nil)
+		req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
+		response, _ := client.Do(req)
+		defer response.Body.Close()
+		document, _ := goquery.NewDocumentFromReader(response.Body)
 
-	tpl.ExecuteTemplate(w, "test2.gohtml", Info)
+		var result string
+		document.Find("dd").Find("span").Each(func(index int, resSeg *goquery.Selection) {
+			result = resSeg.Text()
+		})
+
+		result=strings.TrimSpace(result)
+		fmt.Println("result=", result, "#")
+	} else {
+		fmt.Println("Nope")
+	}
+
+	//tpl.ExecuteTemplate(w, "test2.gohtml", Info)
 }
 func TestSub(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")

@@ -17,8 +17,8 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=UTF-8")
 
 	OJ := r.FormValue("OJ")
-	pNum := r.FormValue("pNum")
-	pName := r.FormValue("pName")
+	pNum := strings.TrimSpace(r.FormValue("pNum"))
+	pName := strings.TrimSpace(r.FormValue("pName"))
 
 	var pListFinal []Inner
 
@@ -34,8 +34,8 @@ func Problem(w http.ResponseWriter, r *http.Request) {
 				pURIb = URISearch("URI Only")
 			} else {
 				rand.Seed(time.Now().UnixNano())
-				min := 1001
-				max := 3100
+				min := 1001 //the first problem in URI is 1001
+				max := 3100 //the last problem in URI is approx. 3100
 				sQuery := rand.Intn(max-min+1) + min
 				pURIb = URISearch(strconv.Itoa(sQuery))
 			}
@@ -125,8 +125,8 @@ func ProblemView(w http.ResponseWriter, r *http.Request) {
 				URIProblem["Des"] = template.HTML(URIGet(pNum))
 				allowSubmit = true
 
-				if pTitle==""{
-					errorPage(w,http.StatusBadRequest)
+				if pTitle == "" {
+					errorPage(w, http.StatusBadRequest)
 					return
 				}
 			} else {
@@ -244,11 +244,11 @@ func Origin(w http.ResponseWriter, r *http.Request) {
 				req.Header.Add("Content-Type", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9")
 				response, _ := client.Do(req)
 				defer response.Body.Close()
-				res,_:=ioutil.ReadAll(response.Body)
-				sRes:=string(res)
+				res, _ := ioutil.ReadAll(response.Body)
+				sRes := string(res)
 
-				need:="iframe"
-				index:=strings.Index(sRes, need)
+				need := "iframe"
+				index := strings.Index(sRes, need)
 
 				if index == -1 { //didn't get any problem
 					errorPage(w, http.StatusBadRequest) //http.StatusBadRequest = 400

@@ -429,6 +429,28 @@ func getLanguage(w http.ResponseWriter, r *http.Request) {
 			LanguagePack{LangValue: "6", LangName: "Python"},
 			LanguagePack{LangValue: "5", LangName: "VB"},
 		}
+	} else if OJ == "URI" {
+		languagePack = []LanguagePack{
+			LanguagePack{LangValue: "1", LangName: "C (gcc  4.8.5)"},
+			LanguagePack{LangValue: "14", LangName: "C99 (gcc  4.8.5)"},
+			LanguagePack{LangValue: "7", LangName: "C# (mono 5.10.1.20)"},
+			LanguagePack{LangValue: "2", LangName: "C++ (g++ 4.8.5)"},
+			LanguagePack{LangValue: "16", LangName: "C++17 (g++ 7.3.0)"},
+			LanguagePack{LangValue: "12", LangName: "Go (go 1.8.1)"},
+			LanguagePack{LangValue: "17", LangName: "Haskell (ghc 7.6.3)"},
+			LanguagePack{LangValue: "3", LangName: "Java 7 (OpenJDK 1.7.0)"},
+			LanguagePack{LangValue: "11", LangName: "Java 8 (OpenJDK 1.8.0)"},
+			LanguagePack{LangValue: "10", LangName: "JavaScript (nodejs 8.4.0)"},
+			LanguagePack{LangValue: "15", LangName: "Kotlin (1.2.10)"},
+			LanguagePack{LangValue: "9", LangName: "Lua (lua 5.2.3)"},
+			LanguagePack{LangValue: "18", LangName: "OCaml (ocamlc 4.01.0)"},
+			LanguagePack{LangValue: "19", LangName: "Pascal (fpc 2.6.2)"},
+			LanguagePack{LangValue: "13", LangName: "PostgreSQL (psql 9.4.19)"},
+			LanguagePack{LangValue: "4", LangName: "Python 2 (Python 2.7.6)"},
+			LanguagePack{LangValue: "5", LangName: "Python 3 (Python 3.4.3)"},
+			LanguagePack{LangValue: "6", LangName: "Ruby (ruby 2.3.0)"},
+			LanguagePack{LangValue: "8", LangName: "Scala (scalac 2.11.8)"},
+		}
 	} else if OJ == "UVA" {
 		languagePack = []LanguagePack{
 			LanguagePack{LangValue: "1", LangName: "ANSI C 5.3.0"},
@@ -486,7 +508,7 @@ func generateToken() string {
 func getOriginLink(apiURL string) string {
 	req, _ := http.NewRequest("GET", apiURL, nil)
 
-	//setting up requset to prevent auto rederict
+	//setting up requset to prevent auto redirect
 	client := &http.Client{
 		CheckRedirect: func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
